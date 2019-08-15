@@ -1,0 +1,26 @@
+<launch>
+    <!--
+    General test file to launch all existing nodes to talk to real hardware
+    -->
+
+    <!--
+    Parameters
+    -->
+    <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/calibration_blackpython.yaml" ns="/calibration" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/rudder_settings.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/sail_settings.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/>
+
+    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+
+    <!--
+    Nodes
+    -->
+
+    <node name="simulation_position1" pkg='sailing_robot' type="repetition_data_recv" output = "screen"/>    
+    <node name="debugging_2D_plot_matplot1" pkg='sailing_robot' type="repetition_matplot" output = "screen"/>
+ </launch>
+

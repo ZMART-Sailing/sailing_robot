@@ -1,0 +1,39 @@
+# CAUTION:
+# Some of these waypoints may not be suitable in all tide conditions!!
+# for simplified entry of path, simply add list of waypoint names
+# starts with list entry 0, continues until end is reached
+#wp/list: ["1", "2", "3"]
+wp/list: ["1", "2","3","4"]
+# triangle: 4, 5, 6
+# position keeping: 4
+# position keeping: 4, 5
+# downwind: 6, 7
+#wp/tasks: [
+#  {"kind": "to_waypoint", "waypoint": "4"},
+#  {"kind": "to_waypoint", "waypoint": "5"},
+#  {"kind": "keep_station", "waypoint": "5", linger: 60},
+#  {"kind": "to_waypoint", "waypoint": "6"},
+#]
+
+# distance within waypoint is accepted, in [m]
+wp/acceptRadius: 1.5
+wp/tackVotingRadius: 20
+
+
+# Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
+#
+wp/table: {"1" : [29.900742, 121.526983],
+            "2" : [29.900715,  121.528218],
+            "3" : [29.89983, 121.528249],
+            "4" : [29.899826,121.52692],
+            "5" : [ 50.8896095, -1.383701666667], 
+            "6" : [50.889478, -1.383536],
+            "7" : [50.889942, -1.384113],
+            "8" : [50.888966, -1.383207],
+            "9" : [50.8889141, -1.383332],
+            "10": [50.888969, -1.383817],
+            "11": [50.888836, -1.383762],
+            "12": [50.888733, -1.383626],
+            "13": [50.889051, -1.383332]
+
+}

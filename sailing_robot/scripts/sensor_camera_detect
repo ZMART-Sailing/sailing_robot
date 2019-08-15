@@ -1,0 +1,105 @@
+#!/usr/bin/python
+# READY FOR MIT
+
+from std_msgs.msg import String
+
+import collections
+import rospy
+import time
+
+import numpy as np
+import cv2
+import datetime
+
+import os
+
+
+class Camera_detection():
+    """
+        Node that publishes the string 'detected' every time an obstacle is detected;
+        otherwise, the string 'nothing' is published.
+
+        An obstacle is detected when more than half of the images within the given averaging time 
+        have a detection area larger than the threshold. 
+        The detection area is the fraction of the total frame that is covered
+        by a colour within the given colour range.
+        both the color range and the minimum needed area for obstacle detection come from ROS param.
+
+        All photos taken for the obstacle detection are saved in ~/camera_detect_obstacle_$datetime
+    """
+    def __init__(self):
+        
+        self.publisher = rospy.Publisher('camera_detection', String, queue_size=10)
+
+        rospy.init_node("sensor_camera_detect", anonymous=True)
+
+        sensor_rate = rospy.get_param("camera_detection/rate")
+        self.rate = rospy.Rate(sensor_rate)
+
+        self.Lower_hsv1 = np.array( rospy.get_param('camera_detection/Lower_color_hsv1'))
+        self.Upper_hsv1 = np.array( rospy.get_param('camera_detection/Upper_color_hsv1'))
+        self.Lower_hsv2 = np.array( rospy.get_param('camera_detection/Lower_color_hsv2'))
+        self.Upper_hsv2 = np.array( rospy.get_param('camera_detection/Upper_color_hsv2'))
+
+        self.threshold = rospy.get_param('camera_detection/threshold')
+        AVE_TIME = rospy.get_param("camera_detection/average_time")   # lengh of the averaging in seconds
+        self.AVE_SIZE = int(AVE_TIME * sensor_rate)                        # size of the averaging sample
+        self.average_list = collections.deque(maxlen = self.AVE_SIZE)
+        self.empty_image_counter = 0   # only save every empty_image_ignore-th empty image
+        self.empty_image_ignore = 5
+        self.publish()
+
+    def publish(self):
+
+        camera = cv2.VideoCapture(0) 
+        # recording 50 images at start to wait for the white balancing to be operational
+        for i in range(50):
+            (bool, image) = camera.read()
+
+        rospy.logwarn('Camera ready')
+        image_size = image.shape[0]*image.shape[1]
+        self.rate.sleep()
+
+        while not rospy.is_shutdown():
+            (bool, image) = camera.read()
+            if bool:
+                hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+                mask_hsv1 = cv2.inRange(hsv, self.Lower_hsv1, self.Upper_hsv1)
+                percent_detect1 = 1.0*cv2.countNonZero(mask_hsv1)  / image_size # percentage of the image that contains the expected colors
+
+                # if only 1 set of color is used, we compute only 1 mask
+                if self.Lower_hsv2[0] != 0 or self.Upper_color_hsv2[0] != 0:
+                    mask_hsv2 = cv2.inRange(hsv, self.Lower_hsv2, self.Upper_hsv2)
+                    percent_detect2 = 1.0*cv2.countNonZero(mask_hsv2)  / image_size # percentage of the image that contains the expected colors
+                else:
+                    percent_detect2 = 0
+                
+                if percent_detect1+percent_detect2  >= self.threshold: 
+                    self.average_list.append(1)
+                else:
+                    self.average_list.append(0)
+                
+                if 1.0*sum(self.average_list)/self.AVE_SIZE > 0.5:
+                    msg = 'detected'
+                    filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}.jpg'.format(datetime.datetime.now()))
+                    cv2.imwrite(filename, image)
+                else:
+                    msg = 'nothing'
+                    self.empty_image_counter +=1
+                    if self.empty_image_counter > self.empty_image_ignore:
+                        filename = os.path.expanduser('~/camera_detected_obstacle_{:%Y-%m-%d_%H:%M:%S_%f}_nothing.jpg'.format(datetime.datetime.now()))
+                        cv2.imwrite(filename, image)
+                        self.empty_image_counter = 0
+    
+
+                self.publisher.publish(msg)
+
+            self.rate.sleep() 
+
+
+if __name__ == '__main__':
+    try:
+        Camera_detection()
+    except rospy.ROSInterruptException:
+        pass
+

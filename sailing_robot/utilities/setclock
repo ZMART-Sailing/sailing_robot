@@ -1,0 +1,62 @@
+#!/usr/bin/python
+"""Set the clock from the GPS unit.
+
+Run this at the start of a test to update the RPi's clock before starting ROS,
+so that timestamps are correct.
+"""
+from __future__ import print_function
+
+import os
+import serial
+import subprocess
+import sys
+import time
+import traceback
+
+import pynmea2
+
+my_dir = os.path.dirname(__file__)
+robot_src_dir = os.path.abspath(os.path.join(my_dir, '../../src/sailing_robot/src'))
+sys.path.append(robot_src_dir)
+
+from sailing_robot.gps_utils import UBXMessage, get_port, UbxNmeaParser
+
+def get_gps_time(serial_port):
+    # Enable GxZDA (time stamp) messages
+    serial_port.write(UBXMessage(b'\x06\x01', payload=b'\xF0\x08\x01').serialise())
+    time.sleep(0.1)
+
+    streamreader = UbxNmeaParser()
+    while True:
+        line = serial_port.readline()
+        if not line.strip():
+            continue
+        print(repr(line))
+        streamreader.feed(line)
+
+        try:
+            batch = list(streamreader.get_msgs())
+        except (pynmea2.ParseError, pynmea2.ChecksumError, UnicodeError):
+            s = "Error parsing GPS data.\nbuffer={!r}\nline={!r}\n{}\n".format(
+                        streamreader.buf, line, traceback.format_exc()
+            )
+            print(s)
+            print("Trying again...")
+            streamreader.stream = b''
+            continue
+
+        for msg in batch:
+            if not isinstance(msg, pynmea2.NMEASentence):
+                continue
+            if (msg.sentence_type == 'ZDA') and (msg.timestamp is not None):
+                return msg.datetime
+
+serial_port = serial.Serial(get_port(), 9600, timeout=0.5)
+print("Getting time from GPS...")
+dtime = get_gps_time(serial_port)
+
+dts = dtime.strftime("%Y-%m-%dT%H:%M:%S")
+print("Setting clock to:", dts)
+print("  (may require sudo password)")
+subprocess.check_call(["sudo", "date", "--utc", "+%Y-%m-%dT%H:%M:%S", "-s", dts])
+print("Done")
