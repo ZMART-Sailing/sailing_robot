@@ -37,7 +37,7 @@ cfg/*.py
 gps-raw*
 
 # qcreator stuff
-CMakeLists.txt
+/CMakeLists.txt
 CMakeLists.txt.user
 
 srv/_*.py
