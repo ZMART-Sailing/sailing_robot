@@ -1,0 +1,15 @@
+RTKTopic:                        '/position'
+RTKFrameID:                      'WGS84'
+
+BroadcastServerIP:               '47.107.161.103'
+BroadcastServerPort:             14143
+ReceiverLocalPort:               14143
+AuthenticationKey:               141421356
+TimeoutReAuth:                   5
+MaxTransferredDataSize:          1024
+
+RTKServiceSerial:                '/dev/ttyACM0'
+SerialBaudRate:                  57600
+SerialDataBits:                  8
+SerialStopBits:                  1
+SerialParity:                    0

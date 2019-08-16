@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<launch>
+    <node pkg="correction_receiver_ros" type="correction_receiver_ros_node" name="correction_receiver_ros" output="screen">
+    <!-- node parameters -->
+    <rosparam file="$(find correction_receiver_ros)/config/correction_receiver_ros_params.yaml" command="load" />
+    </node>
+</launch>
