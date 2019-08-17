@@ -56,8 +56,8 @@ class Nano_Client():
                 jsensor_data = json.loads(sensor_data)
                 print "Recv: ", jsensor_data
                 self.heading.data = jsensor_data['heading']
-                self.position.latitude = jsensor_data['latitude']
-                self.position.longitude = jsensor_data['longitude']
+                self.position.latitude = jsensor_data['latitude'] + 0.0
+                self.position.longitude = jsensor_data['longitude'] + 0.0
                 self.velocity.data = jsensor_data['velocity']
                 # real wind_direction
                 # self.wind_direction_apparent.data = jsensor_data['wind_direction_apparent']
