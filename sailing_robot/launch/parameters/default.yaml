@@ -47,9 +47,9 @@ navigation/beating_angle: 30
 # Oslo in zone 32. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
 # zone you are.
-navigation/utm_zone: 30
+navigation/utm_zone: 51
 # define absolute_wind_direction
-nav/absolute_wind_direction: 30
+nav/absolute_wind_direction: 22
 
 #
 # Helming Procedure
