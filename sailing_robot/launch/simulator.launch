@@ -42,5 +42,4 @@
     <!--node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/-->
 
     <node name = "debugging_dashboard" pkg="sailing_robot" type = "debugging_dashboard" />
-    <node name = "debugging_2D_plot" pkg = "sailing_robot" type = "debugging_2D_plot_matplot" />
  </launch>
