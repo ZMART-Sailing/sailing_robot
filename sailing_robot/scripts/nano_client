@@ -81,7 +81,7 @@ class Nano_Client():
 
     def msgs_publisher(self):
         self.heading_pub.publish(self.heading)
-        self.position_pub.publish(self.position)
+        # self.position_pub.publish(self.position)
         self.velocity_pub.publish(self.velocity)
         self.wind_direction_apparent_pub.publish(self.wind_direction_apparent)
         self.rate.sleep()
