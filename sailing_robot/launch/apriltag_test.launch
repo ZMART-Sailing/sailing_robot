@@ -1,0 +1,10 @@
+<launch>
+    <include file="$(find apriltag_ros)/launch/continuous_detection.launch" >
+	<arg name = "video_device1" default = "/dev/video0" />
+	<arg name = "video_device2" default = "/dev/video1" />
+	<arg name = "image_width"   default = "1280"        />
+	<arg name = "image_height"  default = "720"         />
+	<arg name = "fps"           default = "30"          />
+	<arg name = "is_show"       default = "false"       />
+    </include>
+</launch>
