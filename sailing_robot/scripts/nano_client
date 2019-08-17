@@ -37,7 +37,7 @@ class Nano_Client():
         self.sail_pwm_sub = rospy.Subscriber('debug_sailsheet_pwm', Float32, self.sailservoPWMcontrol)
 
         self.rate = rospy.Rate(10)
-        self.absolute_wind_direction = rospy.get_param('absolute_wind_direction', 0)
+        self.absolute_wind_direction = rospy.get_param('nav/absolute_wind_direction', 0)
 
         self.heading = Float32()
         self.position = NavSatFix()
@@ -63,7 +63,7 @@ class Nano_Client():
                 # self.wind_direction_apparent.data = jsensor_data['wind_direction_apparent']
 
                 # defined wind_direction in default.yaml
-                self.wind_direction_apparent.data = self.absolute_wind_direction - self.velocity.data
+                self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
 
                 print(rospy.get_time())
                 self.msgs_publisher()  # time.sleep(0.1)
