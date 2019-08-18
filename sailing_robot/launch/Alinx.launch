@@ -18,7 +18,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/test2.yaml" command="load"/>
     <!--rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/-->
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
+<!--    <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>-->
 
     <param name="log_name" value="simulator_test"/>
 
