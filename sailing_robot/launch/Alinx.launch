@@ -43,9 +43,9 @@
     <node name="nano_client" pkg="sailing_robot" type="nano_client" output="screen"/>
 
     <!--    pixhawk gps -->
-    <!--    <node name="ser_gps" pkg="sailing_robot" type="ser_gps" output="screen"/>-->
+    <node name="ser_gps" pkg="sailing_robot" type="ser_gps" output="screen"/>
     <!--    base station gps cannot use with pixhawk at same time-->
-    <include file="$(find correction_receiver_ros)/launch/correction_receiver_ros.launch"/>
+    <!--include file="$(find correction_receiver_ros)/launch/correction_receiver_ros.launch"/-->
     <node name="client_tcp" pkg="sailing_robot" type="client_tcp"/>
     <!--node name = "debugging_2D_plot_matplot" pkg="sailing_robot" type="debugging_2D_plot_matplot" /-->
 
@@ -58,4 +58,5 @@
     <!--node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/-->
 
     <node name="debugging_dashboard" pkg="sailing_robot" type="debugging_dashboard"/>
+    <node name ="rosbag_record" pkg = "rosbag" type = "record" respawn = "true" args = "-a -o /home/zmart/sailing_robot" /> 
 </launch>
