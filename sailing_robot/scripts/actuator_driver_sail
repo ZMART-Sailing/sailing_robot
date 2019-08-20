@@ -41,7 +41,7 @@ if __name__ == '__main__':
     #piPWM.set_mode(SAILGPIO, pigpio.OUTPUT) # GPIO 24/RPi PIN 18 as sail servo pin
     post()
     try:
-        debug_pub_pwm = rospy.Publisher('debug_sailsheet_pwm', Int16, queue_size=10)
+        debug_pub_pwm = rospy.Publisher('debug_sailsheet_pwm', Float32, queue_size=10)
         rospy.init_node('actuator_driver_sail', anonymous=True)
         rospy.Subscriber('sailsheet_normalized', Float32, sail_servo_update)
 

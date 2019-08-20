@@ -54,7 +54,7 @@ if __name__ == '__main__':
     #pi = pigpio.pi()
     post()
     try:
-        debug_pub_pwm = rospy.Publisher('debug_rudder_pwm', Int16, queue_size=10)
+        debug_pub_pwm = rospy.Publisher('debug_rudder_pwm', Float32, queue_size=10)
         rospy.init_node('actuator_driver_rudder', anonymous=True)
         rospy.Subscriber('rudder_control', Int16, rudderservoPWMcontrol)
         rospy.spin()
