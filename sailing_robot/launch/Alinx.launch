@@ -14,6 +14,10 @@
               command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/rudder_settings.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/sail_settings.yaml" command="load"/>
+    <!-- new stragy /-->
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/rudder_settings_new.yaml" command="load"/-->
+    <!--rosparam file="$(find sailing_robot)/launch/parameters/sail_settings_new.yaml" command="load"/-->
+
     <!--rosparam file="$(find sailing_robot)/launch/parameters/test.yaml" command="load"/-->
     <rosparam file="$(find sailing_robot)/launch/parameters/test2.yaml" command="load"/>
     <!--rosparam file="$(find sailing_robot)/launch/parameters/sailingClub_waypoints.yaml" command="load"/-->
