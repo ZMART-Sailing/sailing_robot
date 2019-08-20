@@ -1,0 +1,10 @@
+<launch>
+    <arg name = "show" default = "false" />
+    <node name = "yolo_detection" pkg = "ball_detect" type = "yolo_detect" respawn = "true" output = "screen" />
+    <group if = "$(arg show)" >
+        <node name = "image_view" pkg = "image_view"  type = "image_view" respawn = "false" output = "screen" >
+            <remap from = "image" to = "/yolo_detection/image_raw" />
+            <param name="autosize" value="true" />
+        </node>
+    </group>
+</launch>

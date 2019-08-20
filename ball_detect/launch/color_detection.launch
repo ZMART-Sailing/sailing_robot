@@ -1,0 +1,12 @@
+<launch>
+    <arg name = "show"   default = "true" />
+    <node name = "red_ball_detection" pkg = "ball_detect" type = "color_detect" respawn = "true" output = "screen" >
+        <param name = "H_MIN" value = "171" />
+        <param name = "H_MAX" value = "255" />
+        <param name = "S_MIN" value = "22" />
+        <param name = "S_MAX" value = "250" />
+        <param name = "V_MIN" value = "83" />
+        <param name = "V_MAX" value = "256" />
+        <param name = "IS_SHOW" value = "$(arg show)" />
+    </node>
+</launch>
