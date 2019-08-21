@@ -66,7 +66,7 @@ class Nano_Client():
                 self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
 
                 if self.wind_direction_apparent.data < 0:
-                    self.wind_direction_apparent += 360
+                    self.wind_direction_apparent += 360.0
 
                 print(rospy.get_time())
                 self.msgs_publisher()  # time.sleep(0.1)
