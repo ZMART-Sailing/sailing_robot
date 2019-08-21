@@ -103,10 +103,10 @@ if __name__ == '__main__':
             else:
                 i=i+1
         print('00000')
-        # msg_position.latitude = lat*1.0/10000000
-        # msg_position.longitude = lon*1.0/10000000
-        msg_position.latitude = 29.89877
-        msg_position.longitude = 121.527707
+        msg_position.latitude = lat*1.0/10000000
+        msg_position.longitude = lon*1.0/10000000
+        # msg_position.latitude = 29.89877
+        # msg_position.longitude = 121.527707
         position_pub.publish(msg_position)
         data_bytes[0:i]=b''
         time.sleep(0.1)
