@@ -9,62 +9,86 @@ import os
 
 
 class ThreadedTCPRequestHandler(SocketServer.BaseRequestHandler):
+    default_t = 0.1
+    default_param_name = 'default'
+
+    def decode_param_t(self, type_msg):
+        param_name = self.default_param_name
+        t = self.default_t
+        try:
+            param_name = type_msg[0]
+        except IndexError:
+            logger.warning(str(self.client_address) + 'No param name supported, use param nam as default')
+
+        try:
+            t = float(type_msg[1])
+        except ValueError:
+            logger.warning(str(self.client_address) + 'No valid t supported, use t as 0.1')
+        except IndexError:
+            logger.warning(str(self.client_address) + 'No param name or t supported, use t as 0.1')
+
+        return param_name, t
+
     def handle(self):
         logger.info('connected ' + str(self.client_address))
         global msg
-        type = self.request.recv(1024)
-        if type.startswith('Publisher'):
+        type_msg = self.request.recv(1024)
+        if type_msg.startswith('Publisher'):
             logger.info(str(self.client_address) + 'type: Publisher')
-            try:
-                type = float(type[9:])
-            except ValueError:
-                type = 0.1
-            logger.info(str(self.client_address) + 'Time: ' + str(type))
+            logger.debug(type_msg)
+            type_msg = type_msg[9:].split()
+            logger.debug(type_msg)
+            param_name, t = self.decode_param_t(type_msg)
+            logger.info(str(self.client_address) + 'Param: ' + param_name)
+            logger.info(str(self.client_address) + 'Time: ' + str(t))
             count = 0
             while True:
                 recv = self.request.recv(1024)
                 if recv is not None and recv != '':
-                    msg = recv
-                    logger.debug("accepted " + msg)
+                    msg[param_name] = recv
+                    logger.debug('param: ' + param_name + ' accepted: ' + msg[param_name])
                     count = 0
                 else:
-                    logger.debug("accepted Nothing " + str(count))
+                    logger.debug('param: ' + param_name + ' accepted Nothing ' + str(count))
                     count += 1
-                    if count > 60 / type:
-                        logger.debug("accepted Time out")
+                    if count > 60 / t:
+                        logger.debug('param: ' + param_name + ' accepted Time out')
                         break
-                time.sleep(type)
-        elif type.startswith('Subscriber'):
+                time.sleep(t)
+        elif type_msg.startswith('Subscriber'):
             logger.info(str(self.client_address) + 'type: Subscriber')
-            try:
-                type = float(type[10:])
-            except ValueError:
-                type = 0.1
-            logger.info(str(self.client_address) + 'Time: ' + str(type))
+            logger.debug(type_msg)
+            type_msg = type_msg[10:].split()
+            logger.debug(type_msg)
+            param_name, t = self.decode_param_t(type_msg)
+            logger.info(str(self.client_address) + 'Param: ' + param_name)
+            logger.info(str(self.client_address) + 'Time: ' + str(t))
             while True:
-                if msg is not None:
+                if param_name in msg and msg[param_name] is not None:
                     try:
-                        self.request.send(msg)
-                        logger.debug("sent " + msg)
+                        self.request.send(msg[param_name])
+                        logger.debug('param: ' + param_name + ' sent ' + msg[param_name])
                     except IOError as e:
                         logger.warning(str(self.client_address) + ' ' + str(e))
                         break
-                time.sleep(type)
-        elif type.startswith('Shutdown'):
+                time.sleep(t)
+        elif type_msg.startswith('Shutdown'):
+            logger.debug(type_msg)
             logger.info(str(self.client_address) + 'type: Shutdown')
             self.server.shutdown()
             self.request.close()
         else:
+            logger.debug(type_msg)
             logger.info(str(self.client_address) + 'type: Wrong Client')
             pass
         logger.info('close ' + str(self.client_address))
 
 
 if __name__ == "__main__":
-    msg = None
+    msg = dict()
     # 第一步，创建一个logger
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)  # Log等级总开关
+    logger.setLevel(logging.DEBUG)  # Log等级总开关
 
     # 第二步，创建一个handler，用于写入日志文件
     logdir = './log/'
@@ -90,7 +114,7 @@ if __name__ == "__main__":
 
     SocketServer.ThreadingTCPServer.allow_reuse_address = True
     SocketServer.ThreadingTCPServer.timeout = 60
-    server = SocketServer.ThreadingTCPServer(('0.0.0.0', 50001), ThreadedTCPRequestHandler)
+    server = SocketServer.ThreadingTCPServer(('0.0.0.0', 23336), ThreadedTCPRequestHandler)
     logger.debug("server waiting for connection")
 
     # Activate the server; this will keep running until you

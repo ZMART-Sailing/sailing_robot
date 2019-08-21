@@ -88,7 +88,7 @@ class Client_tcp():
         port = 23336
         #   连接到服务器
         mySocket.connect((host, port))
-        mySocket.send('Publisher ' + str(1.0 / self.freq))
+        mySocket.send('Publisher sailing_param ' + str(1.0 / self.freq))
         rospy.loginfo('connected to ' + host)
 
         while not rospy.is_shutdown():

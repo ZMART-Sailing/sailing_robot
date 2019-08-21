@@ -11,7 +11,7 @@ if __name__ == "__main__":
     #   创建套接字
     mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     mySocket.connect((server_config.server_host, server_config.server_port))
-    mySocket.send('Publisher ' + str(t))
+    mySocket.send('Publisher test ' + str(t))
 
     while True:
         try:

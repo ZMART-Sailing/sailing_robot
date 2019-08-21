@@ -57,7 +57,7 @@ def update_msg(msg):
 def update_param(obj):
     mySocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     mySocket.connect((server_config.server_host, server_config.server_port))
-    mySocket.send('Subscriber ' + str(1.0 / obj.rate))
+    mySocket.send('Subscriber sailing_param ' + str(1.0 / obj.rate))
     msg = ''
 
     try:
