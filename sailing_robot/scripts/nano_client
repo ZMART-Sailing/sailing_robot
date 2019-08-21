@@ -70,9 +70,8 @@ class Nano_Client():
 
                 print(rospy.get_time())
                 self.msgs_publisher()  # time.sleep(0.1)
-            except BaseException:
-                print("-----------------")
-                break
+            except BaseException as e:
+                print(e)
 
         sock.close()
 
