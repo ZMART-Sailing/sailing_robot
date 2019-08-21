@@ -55,7 +55,7 @@ class Nano_Client():
                 sensor_data = sock.recv(1024)
                 jsensor_data = json.loads(sensor_data)
                 print "Recv: ", jsensor_data
-                self.heading.data = jsensor_data['heading'] - 165
+                self.heading.data = jsensor_data['heading']
                 self.position.latitude = jsensor_data['latitude'] + 0.0
                 self.position.longitude = jsensor_data['longitude'] + 0.0
                 self.velocity.data = jsensor_data['velocity']
@@ -64,6 +64,9 @@ class Nano_Client():
 
                 # defined wind_direction in default.yaml
                 self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
+
+                if self.wind_direction_apparent.data < 0:
+                    self.wind_direction_apparent += 360
 
                 print(rospy.get_time())
                 self.msgs_publisher()  # time.sleep(0.1)
