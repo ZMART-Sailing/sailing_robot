@@ -42,7 +42,7 @@ config/battery_rate: 0.05
 # Angle area from going directly upwind to the end of the deadzone (the total
 # angular area of the dead zone is therefore 2*beating_angle).
 # in [degrees]
-navigation/beating_angle: 30
+navigation/beating_angle: 45
 # Zone number of the UTM system to use. Southampton is in zone 30,
 # Oslo in zone 32. http://www.dmap.co.uk/utmworld.htm
 # Distance calculations will be less accurate the further from the specified
