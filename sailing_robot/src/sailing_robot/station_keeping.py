@@ -17,7 +17,7 @@ def angleAbsDistance(a, b):
     return min(distanceA, distanceB)
 
 
-class StationKeeping(taskbase.ComplexTaskBase):
+class StationKeeping(taskbase.TaskBase):
     def __init__(self, nav, marker, radius = 5, accept_radius = 15, linger = 300, threshold = 10, marker_id = None,
                  kind = 'keep_station', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
@@ -47,10 +47,7 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.last_wind_direction = None
 
     def calculate_waypoint_ll(self):
-        self.last_wind_direction = self.nav.absolute_wind_direction()
-        return [self.marker.offset(-self.last_wind_direction, self.radius),
-                self.marker.offset(-self.last_wind_direction + 120, self.radius),
-                self.marker.offset(-self.last_wind_direction - 120, self.radius)]
+        return [self.marker]
 
     def calculate_waypoint(self, waypoints_ll = None):
         waypoints, waypoints_ll = super(StationKeeping, self).calculate_waypoint(waypoints_ll)
@@ -58,23 +55,23 @@ class StationKeeping(taskbase.ComplexTaskBase):
         return waypoints, waypoints_ll
 
     def calculate_tasks(self):
-        self.taskdict['list'], _ = self.calculate_waypoint()
+        self.calculate_waypoint()
 
     def check_position(self):
-        if self.start_time is None and self.nav.position_ll.distance(self.marker) <= self.accept_radius:
-            self.start_time = time.time()
+        if self.nav.position_ll.distance(self.marker) <= self.accept_radius:
+            self.nav.direct = True
+            self.nav.task_direct_rudder_control = 40
+            self.nav.task_direct_sailsheet_normalized = 0
+            if self.start_time is None:
+                self.start_time = time.time()
         else:
+            self.nav.direct = False
+            self.nav.task_direct_rudder_control = 0
+            self.nav.task_direct_sailsheet_normalized = 0
             self.start_time = None
 
     def need_update(self):
-        self.debug_pub('dbg_keep_station_waypoint', json.dumps(self.taskdict['list']))
-        return self.last_wind_direction is None or angleAbsDistance(self.last_wind_direction,
-                                                                    self.nav.absolute_wind_direction()) > self.threshold
-
-    def update_tasks(self):
-        _, waypoints = self.calculate_waypoint()
-        for task, waypoint in zip(self.task_runner.tasks, waypoints):
-            task.update_waypoint(waypoint)
+        return False
 
     def check_end_condition(self):
         "Are we done yet?"
