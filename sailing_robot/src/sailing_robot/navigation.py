@@ -5,15 +5,15 @@ from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point, Polygon
 
+
 class Navigation(object):
     """Common navigation machinery used by different modules.
     
     Stores boat position (both lat/long and x/y based on UTM projection), and
     heading, along with apparent wind angle.
     """
-    def __init__(self, 
-                beating_angle=45, utm_zone=30, 
-                safety_zone_ll=None, safety_zone_margin=5):
+
+    def __init__(self, beating_angle = 45, utm_zone = 30, safety_zone_ll = None, safety_zone_margin = 5):
         """
         beating_angle : Closest absolute angle relative to the wind that we can
             sail
@@ -25,7 +25,7 @@ class Navigation(object):
         safety_zone_margin : The safety buffer (in metres) to stay inside
             the bounding box.
         """
-        self.projection = Proj(proj='utm', zone=utm_zone, ellps='WGS84')
+        self.projection = Proj(proj = 'utm', zone = utm_zone, ellps = 'WGS84')
         self.position_ll = ll = LatLon(50.8, 1.02)
         x, y = self.latlon_to_utm(ll.lat.decimal_degree, ll.lon.decimal_degree)
         self.position_xy = Point(x, y)
@@ -35,13 +35,14 @@ class Navigation(object):
         self.safety_zone_ll = safety_zone_ll
         self.safety_zone_margin = safety_zone_margin
         if safety_zone_ll:
-            self.safety_zone = Polygon([
-                self.latlon_to_utm(*p) for p in safety_zone_ll
-            ])
+            self.safety_zone = Polygon([self.latlon_to_utm(*p) for p in safety_zone_ll])
             self.safety_zone_inner = self.safety_zone.buffer(-safety_zone_margin)
         else:
             self.safety_zone = self.safety_zone_inner = None
-    
+        self.direct = False
+        self.task_direct_rudder_control = 0
+        self.task_direct_sailsheet_normalized = 0
+
     def update_position(self, msg):
         self.position_ll = LatLon(msg.latitude, msg.longitude)
         x, y = self.latlon_to_utm(msg.latitude, msg.longitude)
@@ -50,18 +51,18 @@ class Navigation(object):
     def latlon_to_utm(self, lat, lon):
         """Returns (x, y) coordinates in metres"""
         return self.projection(lon, lat)
-    
+
     def utm_to_latlon(self, x, y):
         """Returns a LatLon object"""
-        lon, lat = self.projection(x, y, inverse=True)
+        lon, lat = self.projection(x, y, inverse = True)
         return LatLon(lat, lon)
 
     def update_heading(self, msg):
         self.heading = msg.data
-    
+
     def update_wind_direction(self, msg):
         self.wind_direction = msg.data
-    
+
     def absolute_wind_direction(self):
         """Convert apparent wind direction to absolute wind direction"""
         # This assumes that our speed is negligible relative to wind speed.
@@ -111,20 +112,22 @@ class Navigation(object):
         """
         dx = wp.x - self.position_xy.x
         dy = wp.y - self.position_xy.y
-        d = (dx**2 + dy**2) ** 0.5
+        d = (dx ** 2 + dy ** 2) ** 0.5
         h = math.degrees(math.atan2(dx, dy)) % 360
         return d, h
+
 
 ################
 # General utility functions
 ################
 
-def angleSum(a,b):
+def angleSum(a, b):
     """Add two angles in degrees, returning a value mod 360
     """
-    return (a+b)%360
+    return (a + b) % 360
 
-def angleAbsDistance(a,b):
+
+def angleAbsDistance(a, b):
     """Magnitude of the difference between two angles.
     
     Result should always be between 0 and 180.
@@ -132,6 +135,7 @@ def angleAbsDistance(a,b):
     distanceA = abs((a - b) % 360)
     distanceB = abs((b - a) % 360)
     return min(distanceA, distanceB)
+
 
 def angle_subtract(a, b):
     """Find the difference between two angles.
@@ -143,8 +147,9 @@ def angle_subtract(a, b):
         res -= 360
     return res
 
+
 def angle_average(angle_list):
     """Compute the average angle of a list of angles (the result is % 360)
     """
-    return math.degrees(math.atan2(sum([ math.sin(math.radians(x)) for x in angle_list]),
-                                   sum([ math.cos(math.radians(x)) for x in angle_list]))) % 360
+    return math.degrees(math.atan2(sum([math.sin(math.radians(x)) for x in angle_list]),
+                                   sum([math.cos(math.radians(x)) for x in angle_list]))) % 360

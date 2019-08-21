@@ -9,17 +9,22 @@ returns True.
 import rospy
 from std_msgs.msg import Float32
 from std_msgs.msg import Float64
-from std_msgs.msg import String
+from std_msgs.msg import String, Bool, Int16
 from dynamic_reconfigure.server import Server
 from sailing_robot.make_ros_tasks_runner import make_ros_tasks_runner
 from sailing_robot.navigation import Navigation
 from sailing_robot.cfg import TackVotingConfig
 from sensor_msgs.msg import NavSatFix
 
+nav = None
+
 
 def goal_heading_publisher(tasks_runner):
     pub = rospy.Publisher("goal_heading", Float32, queue_size = 10)
     pub_state = rospy.Publisher("sailing_state", String, queue_size = 10)
+    pub_direct = rospy.Publisher('direct', Bool, queue_size = 10)
+    pub_task_direct_rudder_control = rospy.Publisher('task_direct_rudder_control', Int16, queue_size = 10)
+    pub_task_direct_sailsheet_normalized = rospy.Publisher('task_direct_sailsheet_normalized', Int16, queue_size = 10)
     rate = rospy.Rate(rospy.get_param("config/rate"))
 
     tasks_runner.start_next_task()
@@ -27,6 +32,9 @@ def goal_heading_publisher(tasks_runner):
         state, goal_heading = tasks_runner.calculate_state_and_goal()
         pub.publish(goal_heading)
         pub_state.publish(state)
+        pub_direct.publish(nav.direct)
+        pub_task_direct_rudder_control.publish(nav.task_direct_rudder_control)
+        pub_task_direct_sailsheet_normalized.publish(nav.task_direct_sailsheet_normalized)
         rate.sleep()
 
 
