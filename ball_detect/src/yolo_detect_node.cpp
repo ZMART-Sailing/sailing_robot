@@ -66,7 +66,9 @@ namespace  {
   float heading = 0;
   float pos[3];
   rs2::frame color_frame;
-  sensor_msgs::NavSatFix nav_sub;
+  sensor_msgs::NavSatFix nav_sub = sensor_msgs::NavSatFix();
+  sensor_msgs::NavSatFix last_nav = sensor_msgs::NavSatFix();
+  sensor_msgs::NavSatFix cur_nav = sensor_msgs::NavSatFix();
 }
 
 string intToString(int number);
@@ -120,6 +122,7 @@ int main(int argc, char* argv[])
   int frame_cnt = 0;
   while(ros::ok()) {
     frame_cnt += 1;
+    cout << "begin" << ros::Time::now() << endl;
     //如果被上锁了，直接sleep这一帧
     if (depth_lock) {
       cout << "locked" << endl;
@@ -156,7 +159,6 @@ int main(int argc, char* argv[])
         image_pub_msg.image = color_image;
         color_image_pub.publish(image_pub_msg.toImageMsg());
         data = (uint16_t*)(depth_frame.get_data());
-        nav_pub = nav_sub;
         first_flag = false;
       }
       //否则
@@ -178,13 +180,13 @@ int main(int argc, char* argv[])
             boat_and_ball_msg.heading = 0;
             boat_and_ball_msg.depth = 0;
           }
-          boat_and_ball_msg.boat_pos = nav_pub;
+          boat_and_ball_msg.boat_pos = last_nav;
         }
         else {
           boat_and_ball_msg.isDetected = false;
           boat_and_ball_msg.heading = 0;
           boat_and_ball_msg.depth = 0;
-          boat_and_ball_msg.boat_pos = nav_pub;
+          boat_and_ball_msg.boat_pos = last_nav;
         }
         boat_and_ball_pub.publish(boat_and_ball_msg);
 
@@ -195,15 +197,20 @@ int main(int argc, char* argv[])
         image_pub_msg.image = color_image;
         color_image_pub.publish(image_pub_msg.toImageMsg());
         data = (uint16_t*)(depth_frame.get_data());
-        nav_pub = nav_sub;
       }
       //继续上锁
       depth_lock = true;
     }
     cout << frame_cnt << endl;
     //sleep
+    cout << "spin : " << ros::Time::now() << endl;
     ros::spinOnce();
+    last_nav = cur_nav;
+    cur_nav = nav_sub;
+    cout << "finish : " << ros::Time::now() << endl;
     loop_rate.sleep();
+
+    cout << "end : " << ros::Time::now() << endl;
   }
     return 0;
 }
