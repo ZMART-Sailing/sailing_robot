@@ -17,7 +17,7 @@ def angleAbsDistance(a, b):
     return min(distanceA, distanceB)
 
 
-class StationKeeping(taskbase.TaskBase):
+class StationKeeping(taskbase.ComplexTaskBase):
     def __init__(self, nav, marker, radius = 5, accept_radius = 15, linger = 300, threshold = 10, marker_id = None,
                  kind = 'keep_station', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
