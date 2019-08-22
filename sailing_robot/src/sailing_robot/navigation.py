@@ -1,6 +1,7 @@
 """Common navigation machinery used by different modules"""
 
 import math
+import collections
 from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point, Polygon
@@ -42,6 +43,37 @@ class Navigation(object):
         self.direct = False
         self.task_direct_rudder_control = 0
         self.task_direct_sailsheet_normalized = 0
+        self.detected = None
+        self.detected_list = []
+        self.boat_position = None
+        self.relative_position_heading = None
+        self.relative_position_distance = None
+        self.relative_position = None
+        self.relative_position_list = []
+        self.ball_position = None
+
+    def update_boat_and_ball(self, msg):
+        self.detected = msg.isDetected.data
+        self.boat_position = LatLon(msg.boat_pos.latitude, msg.boat_pos.longitude)
+        self.relative_position_distance = (msg.ball_pos.x ** 2 + msg.ball_pos.y ** 2 + msg.ball_pos.z ** 2) ** 0.5
+        self.relative_position_heading = math.atan2(msg.ball_pos.z, msg.ball_pos.x) + self.heading
+        if self.relative_position_heading > 360:
+            self.relative_position_heading -= 360
+        self.relative_position = self.boat_position.offset(self.relative_position_heading,
+                                                           self.relative_position_distance)
+        if len(self.detected_list) == 20:
+            pop = self.detected_list.pop(0)
+            if pop:
+                self.relative_position_list.pop(0)
+        self.detected_list.append(self.detected)
+        if self.detected:
+            self.relative_position_list.append(self.relative_position)
+
+    def calculate_ball_position(self):
+        self.ball_position = LatLon(
+            sum([pos.latitude for pos in self.relative_position_list]) / len(self.relative_position_list),
+            sum([pos.longitude for pos in self.relative_position_list]) / len(self.relative_position_list))
+        return self.ball_position
 
     def update_position(self, msg):
         self.position_ll = LatLon(msg.latitude, msg.longitude)
@@ -129,7 +161,7 @@ def angleSum(a, b):
 
 def angleAbsDistance(a, b):
     """Magnitude of the difference between two angles.
-    
+
     Result should always be between 0 and 180.
     """
     distanceA = abs((a - b) % 360)
@@ -139,7 +171,7 @@ def angleAbsDistance(a, b):
 
 def angle_subtract(a, b):
     """Find the difference between two angles.
-    
+
     The result should be between -180 (if a<b) and +180 (if a>b)
     """
     res = (a - b) % 360

@@ -7,22 +7,22 @@ from .navigation import angleSum
 from .taskbase import TaskBase
 from .heading_planning import TackVoting
 
-# For calculations, lay lines don't extend to infinity.
-# This is in m; 10km should be plenty for our purposes.
-LAYLINE_EXTENT = 10000
-
 
 class HeadingPlan(TaskBase):
+    # For calculations, lay lines don't extend to infinity.
+    # This is in m; 10km should be plenty for our purposes.
+    LAYLINE_EXTENT = 10000
+
     def __init__(self, nav, waypoint = ll.LatLon(50.742810, 1.014469),  # somewhere in the solent
                  target_radius = 2, tack_voting_radius = 15, waypoint_id = '', name = '', *args, **kwargs):
         """Sail towards a waypoint.
 
         *nav* is a sailing_robot.navigation.Navigation instance.
-        
+
         *waypoint* is a LatLon object telling us where to go.
-        
+
         *target_radius* is how close we need to get to the waypoint, in metres.
-        
+
         *tack_voting_radius* is the distance within which we use tack voting, to
         avoid too frequent tacks close to the waypoint.
         """
@@ -134,9 +134,9 @@ class HeadingPlan(TaskBase):
         downwind = angleSum(self.nav.absolute_wind_direction(), 180)
         x0, y0 = self.waypoint_xy.x, self.waypoint_xy.y
         l1 = math.radians(angleSum(downwind, -self.nav.beating_angle))
-        x1 = x0 + (LAYLINE_EXTENT * math.sin(l1))
-        y1 = y0 + (LAYLINE_EXTENT * math.cos(l1))
+        x1 = x0 + (self.LAYLINE_EXTENT * math.sin(l1))
+        y1 = y0 + (self.LAYLINE_EXTENT * math.cos(l1))
         l2 = math.radians(angleSum(downwind, self.nav.beating_angle))
-        x2 = x0 + (LAYLINE_EXTENT * math.sin(l2))
-        y2 = y0 + (LAYLINE_EXTENT * math.cos(l2))
+        x2 = x0 + (self.LAYLINE_EXTENT * math.sin(l2))
+        y2 = y0 + (self.LAYLINE_EXTENT * math.cos(l2))
         return Polygon([(x0, y0), (x1, y1), (x2, y2)])
