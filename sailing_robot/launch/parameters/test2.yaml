@@ -9,10 +9,10 @@
 # position keeping: 4, 5
 # downwind: 6, 7
 wp/tasks: [
-#  {"kind": "to_waypoint", "waypoint": "4"},
-#  {"kind": "to_waypoint", "waypoint": "5"},
-  {"kind": "keep_station", "waypoint": "5", linger: 60},
-  {"kind": "to_waypoint", "waypoint": "6"},
+  {"kind": "to_waypoint", "waypoint": "4"},
+  {"kind": "to_waypoint", "waypoint": "2"},
+  {"kind": "keep_station", "waypoint": "2", linger: 60},
+  {"kind": "to_waypoint", "waypoint": "3"},
 ]
 
 # distance within waypoint is accepted, in [m]
