@@ -15,6 +15,7 @@ msg/*Result.msg
 msg/_*.py
 devel/
 local/
+apriltag/CMakeLists.txt
 
 *.weights
 *.backup
