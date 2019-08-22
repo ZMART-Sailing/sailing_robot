@@ -56,6 +56,7 @@ namespace  {
   const float DEPTH_MAX = 10;
 
   bool depth_lock = false;
+  bool first_flag = true;
   uint16_t* data = NULL;
   float center[2];
   deque<int> detect_list(20, 0);
@@ -65,7 +66,7 @@ namespace  {
   float heading = 0;
   float pos[3];
   rs2::frame color_frame;
-  sensor_msgs::NavSatFix nav;
+  sensor_msgs::NavSatFix nav_sub;
 }
 
 string intToString(int number);
@@ -116,74 +117,99 @@ int main(int argc, char* argv[])
   //声明数据流
   auto depth_stream = profile.get_stream(RS2_STREAM_DEPTH).as<rs2::video_stream_profile>();
   auto color_stream = profile.get_stream(RS2_STREAM_COLOR).as<rs2::video_stream_profile>();
-
+  int frame_cnt = 0;
   while(ros::ok()) {
-    rs2::frameset frameset = pipe.wait_for_frames();
-    //取深度图和彩色图
-    rs2::frame color_frame = frameset.get_color_frame();
-    rs2::depth_frame depth_frame = frameset.get_depth_frame();
-
-    auto depth_profile = depth_frame.get_profile().as<rs2::video_stream_profile>();
-    auto color_profile = color_frame.get_profile().as<rs2::video_stream_profile>();
-
-    //获取相机的内参和外参矩阵
-    const rs2_intrinsics depth_intrin = depth_profile.get_intrinsics();
-    const rs2_intrinsics color_intrin = color_profile.get_intrinsics();
-    const rs2_extrinsics c2dextrin = color_profile.get_extrinsics_to(depth_profile);
-    const rs2_extrinsics d2cextrin = depth_profile.get_extrinsics_to(color_profile);
-
-    //获取宽高
-    const int depth_w = depth_frame.as<rs2::video_frame>().get_width();
-    const int depth_h = depth_frame.as<rs2::video_frame>().get_height();
-    const int color_w = color_frame.as<rs2::video_frame>().get_width();
-    const int color_h = color_frame.as<rs2::video_frame>().get_height();
-
-    //创建OPENCV类型 并传入数据
-    Mat depth_image(Size(depth_w,depth_h), CV_16U,  (void*)depth_frame.get_data(), Mat::AUTO_STEP);
-    Mat color_image(Size(color_w,color_h), CV_8UC3, (void*)color_frame.get_data(), Mat::AUTO_STEP);
-
-    //发布彩色图
-    cv_bridge::CvImage image_pub_msg;
-    image_pub_msg.header.stamp = ros::Time::now();
-    image_pub_msg.encoding = sensor_msgs::image_encodings::BGR8;
-    image_pub_msg.image = color_image;
-    color_image_pub.publish(image_pub_msg.toImageMsg());
-
-    if(!depth_lock)
-      data = (uint16_t*)(depth_frame.get_data());
-    //这句就是同时发布节点和订阅节点的关键了
-    ros::spinOnce();
-    cout << isDetected << endl;
-    ball_detect::BoatAndBall boat_and_ball_msg;
-    if (isDetected) {
-      float depth_pixel[2];
-      rs2_project_color_pixel_to_depth_pixel(depth_pixel, data, depth_scale, DEPTH_MIN, DEPTH_MAX, \
-                                                     &depth_intrin, &color_intrin, &c2dextrin, &d2cextrin, center);
-      if(pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth)) {
-        boat_and_ball_msg.isDetected = true;
-        boat_and_ball_msg.heading = heading;
-        boat_and_ball_msg.depth = depth;
-      }
-      else {
-        boat_and_ball_msg.isDetected = false;
-        boat_and_ball_msg.heading = 0;
-        boat_and_ball_msg.depth = 0;
-      }
-      boat_and_ball_msg.boat_pos = nav;
+    frame_cnt += 1;
+    //如果被上锁了，直接sleep这一帧
+    if (depth_lock) {
+      cout << "locked" << endl;
     }
+
     else {
-      boat_and_ball_msg.isDetected = false;
-      boat_and_ball_msg.heading = 0;
-      boat_and_ball_msg.depth = 0;
-      boat_and_ball_msg.boat_pos = nav;
+      cout << "unlocked" << endl;
+      rs2::frameset frameset = pipe.wait_for_frames();
+      //取深度图和彩色图
+      rs2::frame color_frame = frameset.get_color_frame();
+      rs2::depth_frame depth_frame = frameset.get_depth_frame();
+
+      auto depth_profile = depth_frame.get_profile().as<rs2::video_stream_profile>();
+      auto color_profile = color_frame.get_profile().as<rs2::video_stream_profile>();
+
+      //获取相机的内参和外参矩阵
+      const rs2_intrinsics depth_intrin = depth_profile.get_intrinsics();
+      const rs2_intrinsics color_intrin = color_profile.get_intrinsics();
+      const rs2_extrinsics c2dextrin = color_profile.get_extrinsics_to(depth_profile);
+      const rs2_extrinsics d2cextrin = depth_profile.get_extrinsics_to(color_profile);
+      //获取宽高
+      const int color_w = color_frame.as<rs2::video_frame>().get_width();
+      const int color_h = color_frame.as<rs2::video_frame>().get_height();
+      Mat color_image(Size(color_w,color_h), CV_8UC3, (void*)color_frame.get_data(), Mat::AUTO_STEP);
+
+      sensor_msgs::NavSatFix nav_pub;
+      //如果是第一帧,不calculate and publish result, only update data, and lock
+      if (first_flag) {
+        cout << "first" << endl;
+        //发布彩色图
+        cv_bridge::CvImage image_pub_msg;
+        image_pub_msg.header.stamp = ros::Time::now();
+        image_pub_msg.encoding = sensor_msgs::image_encodings::BGR8;
+        image_pub_msg.image = color_image;
+        color_image_pub.publish(image_pub_msg.toImageMsg());
+        data = (uint16_t*)(depth_frame.get_data());
+        nav_pub = nav_sub;
+        first_flag = false;
+      }
+      //否则
+      else {
+        cout << "unlock" << endl;
+        // first calculate result and publish it
+        ball_detect::BoatAndBall boat_and_ball_msg;
+        if (isDetected) {
+          float depth_pixel[2];
+          rs2_project_color_pixel_to_depth_pixel(depth_pixel, data, depth_scale, DEPTH_MIN, DEPTH_MAX, \
+                                                         &depth_intrin, &color_intrin, &c2dextrin, &d2cextrin, center);
+          if(pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth)) {
+            boat_and_ball_msg.isDetected = true;
+            boat_and_ball_msg.heading = heading;
+            boat_and_ball_msg.depth = depth;
+          }
+          else {
+            boat_and_ball_msg.isDetected = false;
+            boat_and_ball_msg.heading = 0;
+            boat_and_ball_msg.depth = 0;
+          }
+          boat_and_ball_msg.boat_pos = nav_pub;
+        }
+        else {
+          boat_and_ball_msg.isDetected = false;
+          boat_and_ball_msg.heading = 0;
+          boat_and_ball_msg.depth = 0;
+          boat_and_ball_msg.boat_pos = nav_pub;
+        }
+        boat_and_ball_pub.publish(boat_and_ball_msg);
+
+        //update data
+        cv_bridge::CvImage image_pub_msg;
+        image_pub_msg.header.stamp = ros::Time::now();
+        image_pub_msg.encoding = sensor_msgs::image_encodings::BGR8;
+        image_pub_msg.image = color_image;
+        color_image_pub.publish(image_pub_msg.toImageMsg());
+        data = (uint16_t*)(depth_frame.get_data());
+        nav_pub = nav_sub;
+      }
+      //继续上锁
+      depth_lock = true;
     }
-    boat_and_ball_pub.publish(boat_and_ball_msg);
+    cout << frame_cnt << endl;
+    //sleep
+    ros::spinOnce();
     loop_rate.sleep();
   }
     return 0;
 }
 
 void detectCallBack(const std_msgs::Int8::ConstPtr& msg) {
+  cout << "detectCallBack" << endl;
   depth_lock = false;
   if (msg->data == true) {
     isDetected = true;
@@ -194,6 +220,7 @@ void detectCallBack(const std_msgs::Int8::ConstPtr& msg) {
 }
 
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
+  cout << "yoloCallBack" << endl;
   int area = 0, x, y;
   double prob = 0;
   for(size_t i = 0; i < msg->bounding_boxes.size(); i++) {
@@ -217,12 +244,13 @@ void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
 }
 
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
-    nav.header = msg->header;
-    nav.status = msg->status;
-    nav.altitude = msg->altitude;
-    nav.latitude = msg->latitude;
-    nav.longitude = msg->longitude;
-    nav.position_covariance = msg->position_covariance;
+    cout << "posCallBack" << endl;
+    nav_sub.header = msg->header;
+    nav_sub.status = msg->status;
+    nav_sub.altitude = msg->altitude;
+    nav_sub.latitude = msg->latitude;
+    nav_sub.longitude = msg->longitude;
+    nav_sub.position_covariance = msg->position_covariance;
 }
 
 float getScore(deque<int>* dtc_list) {
