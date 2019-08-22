@@ -122,14 +122,14 @@ int main(int argc, char* argv[])
   int frame_cnt = 0;
   while(ros::ok()) {
     frame_cnt += 1;
-    cout << "begin" << ros::Time::now() << endl;
+    // cout << "begin" << ros::Time::now() << endl;
     //如果被上锁了，直接sleep这一帧
     if (depth_lock) {
-      cout << "locked" << endl;
+      // cout << "locked" << endl;
     }
 
     else {
-      cout << "unlocked" << endl;
+      // cout << "unlocked" << endl;
       rs2::frameset frameset = pipe.wait_for_frames();
       //取深度图和彩色图
       rs2::frame color_frame = frameset.get_color_frame();
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
       sensor_msgs::NavSatFix nav_pub;
       //如果是第一帧,不calculate and publish result, only update data, and lock
       if (first_flag) {
-        cout << "first" << endl;
+        // cout << "first" << endl;
         //发布彩色图
         cv_bridge::CvImage image_pub_msg;
         image_pub_msg.header.stamp = ros::Time::now();
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
       }
       //否则
       else {
-        cout << "unlock" << endl;
+        // cout << "unlock" << endl;
         // first calculate result and publish it
         ball_detect::BoatAndBall boat_and_ball_msg;
         if (isDetected) {
@@ -203,20 +203,20 @@ int main(int argc, char* argv[])
     }
     cout << frame_cnt << endl;
     //sleep
-    cout << "spin : " << ros::Time::now() << endl;
+    // cout << "spin : " << ros::Time::now() << endl;
     ros::spinOnce();
     last_nav = cur_nav;
     cur_nav = nav_sub;
-    cout << "finish : " << ros::Time::now() << endl;
+    // cout << "finish : " << ros::Time::now() << endl;
     loop_rate.sleep();
 
-    cout << "end : " << ros::Time::now() << endl;
+    // cout << "end : " << ros::Time::now() << endl;
   }
     return 0;
 }
 
 void detectCallBack(const std_msgs::Int8::ConstPtr& msg) {
-  cout << "detectCallBack" << endl;
+  // cout << "detectCallBack" << endl;
   depth_lock = false;
   if (msg->data == true) {
     isDetected = true;
@@ -227,7 +227,7 @@ void detectCallBack(const std_msgs::Int8::ConstPtr& msg) {
 }
 
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
-  cout << "yoloCallBack" << endl;
+  // cout << "yoloCallBack" << endl;
   int area = 0, x, y;
   double prob = 0;
   for(size_t i = 0; i < msg->bounding_boxes.size(); i++) {
@@ -251,7 +251,7 @@ void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
 }
 
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
-    cout << "posCallBack" << endl;
+    // cout << "posCallBack" << endl;
     nav_sub.header = msg->header;
     nav_sub.status = msg->status;
     nav_sub.altitude = msg->altitude;
