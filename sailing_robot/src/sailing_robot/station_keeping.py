@@ -60,7 +60,10 @@ class StationKeeping(taskbase.ComplexTaskBase):
     def check_position(self):
         if self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius:
             self.nav.direct = True
-            self.nav.task_direct_rudder_control = 40
+            self.nav.task_direct_rudder_control = -40
+            _, hwp = self.nav.distance_and_heading(self.marker_xy)
+            if 90 < hwp < 270:
+                self.nav.task_direct_rudder_control = -self.nav.task_direct_rudder_control
             self.nav.task_direct_sailsheet_normalized = 0
             if self.start_time is None:
                 self.start_time = time.time()
