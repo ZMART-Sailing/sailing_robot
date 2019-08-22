@@ -1,0 +1,32 @@
+<launch>
+    <arg name = "video_device"  default = "/dev/video1" />
+    <arg name = "image_width"   default = "1280"        />
+    <arg name = "image_height"  default = "720"         />
+    <arg name = "fps"           default = "30"          />
+    <arg name = "is_show"       default = "true"       />
+    <arg name = "pixel_format"  default = "mjpeg"       />
+
+  <include file="$(find usb_cam)/launch/single_usb_cam.launch">
+    <arg name = "video_device"  value = "$(arg video_device)"   />
+    <arg name = "image_width"   default = "$(arg image_width)"   />
+    <arg name = "image_height"  default = "$(arg image_height)"  />
+    <arg name = "fps"           default = "$(arg fps)"           />
+    <arg name = "pixel_format"  default = "$(arg pixel_format)"  />
+    <arg name = "is_show"       default = "$(arg is_show)"       />
+  </include>
+
+  <arg name = "launch_prefix" default = "" />
+  <arg name = "ns1" default = "apriltag_ros_continuous_node1"/>
+
+  <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml" ns="$(arg ns1)" />
+  <rosparam command="load" file="$(find apriltag_ros)/config/tags.yaml"     ns="$(arg ns1)" />
+  
+  <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns1)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
+    <remap from="image_rect"  to="/usb_cam/image_raw" />
+    <remap from="camera_info" to="/usb_cam/camera_info" />
+    <remap from="boat_orient" to="/boat_orient" />
+    <param name="camera_frame" type="str" value="/camera" />
+    <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
+  </node>
+
+</launch>

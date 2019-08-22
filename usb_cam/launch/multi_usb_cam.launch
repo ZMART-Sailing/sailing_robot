@@ -1,0 +1,48 @@
+<launch>
+  <arg name = "video_device1" default = "/dev/video1" />
+  <arg name = "video_device2" default = "/dev/video2" />
+
+  <arg name = "image_width1"   default = "1280"        />
+  <arg name = "image_height1"  default = "720"         />
+  <arg name = "fps1"           default = "30"          />
+  <arg name = "pixel_format1"  default = "mjpeg"       />
+
+  <arg name = "image_width2"   default = "1280"        />
+  <arg name = "image_height2"  default = "720"         />
+  <arg name = "fps2"           default = "30"          />
+  <arg name = "pixel_format2"  default = "mjpeg"       />
+
+  <arg name = "is_show"       default = "true"        />
+
+  <node name="usb_cam1" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="$(arg video_device1)" />
+    <param name="image_width" value="$(arg image_width1)"    />
+    <param name="image_height" value="$(arg image_height1)"  />
+    <param name="framerate" value="$(arg fps1)"              />
+    <param name="pixel_format" value="$(arg pixel_format1)"  />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+
+  <node name="usb_cam2" pkg="usb_cam" type="usb_cam_node" output="screen" >
+    <param name="video_device" value="$(arg video_device2)" />
+    <param name="image_width" value="$(arg image_width2)"    />
+    <param name="image_height" value="$(arg image_height2)"  />
+    <param name="framerate" value="$(arg fps2)"              />
+    <param name="pixel_format" value="$(arg pixel_format2)" />
+    <param name="camera_frame_id" value="usb_cam" />
+    <param name="io_method" value="mmap"/>
+  </node>
+
+  <group if = "$(arg is_show)">
+    <node name="image_view1" pkg="image_view" type="image_view" respawn="false" output="screen">
+      <remap from="image" to="/usb_cam1/image_raw"/>
+      <param name="autosize" value="true" />
+    </node>
+    <node name="image_view2" pkg="image_view" type="image_view" respawn="false" output="screen">
+      <remap from="image" to="/usb_cam2/image_raw"/>
+      <param name="autosize" value="true" />
+    </node>
+  </group>
+
+</launch>
