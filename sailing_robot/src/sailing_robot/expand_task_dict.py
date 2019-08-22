@@ -59,7 +59,7 @@ def expand_task_dict(wp_params):
                     'linger': wp_task.get('linger', 300),
                     'radius': wp_task.get('radius', 5),
                     'threshold': wp_task.get('threshold', 10),
-                    'accept_radius': wp_task.get('radius', 10),
+                    'accept_radius': wp_task.get('radius', 3),
                     'tack_voting_radius': wp_task.get('accept_radius', tack_voting_radius),
                     'target_radius': wp_task.get('accept_radius', target_radius)
                 }

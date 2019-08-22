@@ -29,7 +29,7 @@
     <!--
     Nodes
     -->
-    <node name="tasks" pkg="sailing_robot" type="tasks"/>
+    <node name="tasks" pkg="sailing_robot" type="tasks" output="screen"/>
     <!-- uncomment if helming is not used
     <node name = "tack" pkg="sailing_robot" type = "tack" />
     <node name = "actuator_demand_rudder" pkg="sailing_robot" type = "actuator_demand_rudder" />
