@@ -1,0 +1,3 @@
+bool isDetected
+sensor_msgs/NavSatFix boat_pos
+geometry_msgs/Point32 ball_pos
