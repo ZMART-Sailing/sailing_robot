@@ -56,23 +56,23 @@ namespace  {
   const float DEPTH_MAX = 10;
 
   bool depth_lock = false;
-  bool pos_lock = false;
   uint16_t* data = NULL;
   float center[2];
   deque<int> detect_list(20, 0);
   deque<float*> pos_list(20);
   bool isDetected = false;
   float depth = -1;
+  float heading = 0;
   float pos[3];
   rs2::frame color_frame;
-  ball_detect::BoatAndBall* boat_and_ball_msg;
+  sensor_msgs::NavSatFix nav;
 }
 
 string intToString(int number);
 string floatToString(float number);
 
 void pixel2Point(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float u[2], float* upoint, float& depth);
-bool pixel2Heading(const rs2::depth_frame* frame, float u[2], float& heading, float& depth);
+bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float u[2], float& heading, float& depth);
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg);
 void detectCallBack(const std_msgs::Int8::ConstPtr& msg);
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg);
@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
   //从yolo订阅检测信息
   ros::Subscriber detect_sub = node_.subscribe("/darknet_ros/found_object", 1000, detectCallBack);
   ros::Subscriber boxes_sub = node_.subscribe("/darknet_ros/bounding_boxes", 1000, yoloCallBack);
-//  ros::Subscriber boat_pos_sub = node_.subscribe("/position", 1000, posCallBack);
+  ros::Subscriber boat_pos_sub = node_.subscribe("/position", 1000, posCallBack);
 
   //发布经过处理的检测信息
   ros::Publisher boat_and_ball_pub = node_.advertise<ball_detect::BoatAndBall>("boat_and_ball", 10);
@@ -113,7 +113,6 @@ int main(int argc, char* argv[])
   rs2::device dev = profile.get_device();
   rs2::depth_sensor ds = dev.query_sensors().front().as<rs2::depth_sensor>();
   float depth_scale = ds.get_depth_scale();
-
   //声明数据流
   auto depth_stream = profile.get_stream(RS2_STREAM_DEPTH).as<rs2::video_stream_profile>();
   auto color_stream = profile.get_stream(RS2_STREAM_COLOR).as<rs2::video_stream_profile>();
@@ -152,29 +151,33 @@ int main(int argc, char* argv[])
 
     if(!depth_lock)
       data = (uint16_t*)(depth_frame.get_data());
-    depth_lock = true;
     //这句就是同时发布节点和订阅节点的关键了
     ros::spinOnce();
-    //把船的位置上锁
-    pos_lock = true;
-
+    cout << isDetected << endl;
+    ball_detect::BoatAndBall boat_and_ball_msg;
     if (isDetected) {
       float depth_pixel[2];
       rs2_project_color_pixel_to_depth_pixel(depth_pixel, data, depth_scale, DEPTH_MIN, DEPTH_MAX, \
                                                      &depth_intrin, &color_intrin, &c2dextrin, &d2cextrin, center);
-      pixel2Point(&depth_frame, &depth_intrin, depth_pixel, pos, depth);
-      boat_and_ball_msg->isDetected = true;
-      boat_and_ball_msg->ball_pos.x = pos[0];
-      boat_and_ball_msg->ball_pos.y = pos[1];
-      boat_and_ball_msg->ball_pos.z = depthCubicCalibration(pos[2]);
+      if(pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth)) {
+        boat_and_ball_msg.isDetected = true;
+        boat_and_ball_msg.heading = heading;
+        boat_and_ball_msg.depth = depth;
+      }
+      else {
+        boat_and_ball_msg.isDetected = false;
+        boat_and_ball_msg.heading = 0;
+        boat_and_ball_msg.depth = 0;
+      }
+      boat_and_ball_msg.boat_pos = nav;
     }
     else {
-      pos[0] = pos[1] = pos[2] = 0;
-      boat_and_ball_msg->isDetected = false;
-      boat_and_ball_msg->ball_pos.x = pos[0];
-      boat_and_ball_msg->ball_pos.y = pos[1];
-      boat_and_ball_msg->ball_pos.z = pos[2];
+      boat_and_ball_msg.isDetected = false;
+      boat_and_ball_msg.heading = 0;
+      boat_and_ball_msg.depth = 0;
+      boat_and_ball_msg.boat_pos = nav;
     }
+    boat_and_ball_pub.publish(boat_and_ball_msg);
     loop_rate.sleep();
   }
     return 0;
@@ -214,14 +217,12 @@ void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
 }
 
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
-  if (!pos_lock) {
-    boat_and_ball_msg->boat_pos.header = msg->header;
-    boat_and_ball_msg->boat_pos.status = msg->status;
-    boat_and_ball_msg->boat_pos.altitude = msg->altitude;
-    boat_and_ball_msg->boat_pos.latitude = msg->latitude;
-    boat_and_ball_msg->boat_pos.longitude = msg->longitude;
-    boat_and_ball_msg->boat_pos.position_covariance = msg->position_covariance;
-  }
+    nav.header = msg->header;
+    nav.status = msg->status;
+    nav.altitude = msg->altitude;
+    nav.latitude = msg->latitude;
+    nav.longitude = msg->longitude;
+    nav.position_covariance = msg->position_covariance;
 }
 
 float getScore(deque<int>* dtc_list) {
@@ -273,9 +274,9 @@ bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, 
  }
  else {
    if (upoint[0] > 0)
-     heading = atan2f(upoint[0], upoint[2]);
+     heading = atan2f(upoint[0], upoint[2]) * 180 / PI;
    else
-     heading = atan2f(upoint[0], upoint[2]) + PI * 2;
+     heading = (atan2f(upoint[0], upoint[2]) + PI * 2) * 180 / PI;
    return true;
  }
 }
