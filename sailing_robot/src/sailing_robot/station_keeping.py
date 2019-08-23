@@ -70,7 +70,7 @@ class StationKeeping(taskbase.ComplexTaskBase):
                 hwp += 360
             if hwp > 180:
                 hwp -= 360
-            self.nav.task_direct_rudder_control = hwp * 4.0 / 3
+            self.nav.task_direct_rudder_control = -hwp * 4.0 / 3
             if abs(self.nav.task_direct_rudder_control) > 40:
                 self.nav.task_direct_rudder_control = 40 if self.nav.task_direct_rudder_control > 0 else -40
             self.nav.task_direct_sailsheet_normalized = 0
