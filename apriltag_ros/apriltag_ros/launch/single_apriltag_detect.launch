@@ -3,11 +3,11 @@
     <arg name = "image_width"   default = "1280"        />
     <arg name = "image_height"  default = "720"         />
     <arg name = "fps"           default = "30"          />
-    <arg name = "is_show"       default = "true"       />
+    <arg name = "is_show"       default = "true"        />
     <arg name = "pixel_format"  default = "mjpeg"       />
 
   <include file="$(find usb_cam)/launch/single_usb_cam.launch">
-    <arg name = "video_device"  value = "$(arg video_device)"   />
+    <arg name = "video_device"  default = "$(arg video_device)"   />
     <arg name = "image_width"   default = "$(arg image_width)"   />
     <arg name = "image_height"  default = "$(arg image_height)"  />
     <arg name = "fps"           default = "$(arg fps)"           />
