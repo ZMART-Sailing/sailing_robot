@@ -31,8 +31,6 @@ def expand_task(taskdict, nav, name = '', index = None):
     if index is not None:
         name += '_' + str(index)
     if kind in build_task_dict:
-        print kind
-        print taskdict
         task = build_task_dict[kind](nav = nav, name = name, **taskdict)
     else:
         raise ValueError("Unknown task type: {}".format(kind))

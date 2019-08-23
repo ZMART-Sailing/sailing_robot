@@ -34,7 +34,10 @@ class ComplexTaskBase(TaskBase):
     def __init__(self, *args, **kwargs):
         self.taskdict = kwargs
         self.calculate_tasks()
-        self.heading_plan = make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/heading_plan')
+        self.heading_plan = make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/heading_plan')[0]
+
+    def init_ros(self):
+        self.heading_plan.debug_pub = self.debug_pub
 
     def calculate_waypoint_ll(self):
         pass

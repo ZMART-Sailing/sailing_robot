@@ -42,7 +42,7 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.accept_radius = accept_radius
         self.start_time = None
         self.name = name
-        self.debug_topics = [('dbg_keep_station_waypoint', 'String'), ]
+        self.debug_topics = [('dbg_station_time', 'Float32'), ]
         super(StationKeeping, self).__init__(**kwargs)
         self.last_wind_direction = None
 
@@ -66,6 +66,8 @@ class StationKeeping(taskbase.ComplexTaskBase):
         return -hwp * 4.0 / 3
 
     def check_position(self):
+        if self.start_time is not None:
+            self.debug_pub('dbg_station_time', time.time() - self.start_time)
         if self.start_time is None and self.nav.position_ll.distance(self.waypoint) * 1000 <= self.accept_radius:
             self.start_time = time.time()
         if self.nav.position_ll.distance(self.waypoint) * 1000 <= self.radius:

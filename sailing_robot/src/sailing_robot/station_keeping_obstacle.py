@@ -21,7 +21,8 @@ class StationKeeping(station_keeping.StationKeeping):
         """
         self.min_radius = min_radius
         self.max_radius = max_radius
-        super(StationKeeping, self).__init__(radius, accept_radius, linger, kind, *args, **kwargs)
+        super(StationKeeping, self).__init__(radius = radius, accept_radius = accept_radius, linger = linger, *args,
+                                             **kwargs)
 
         self.controller = PID(self.nav.rudder_param['control']['Kp'], self.nav.rudder_param['control']['Ki'],
                               self.nav.rudder_param['control']['Kd'], self.nav.rudder_param['maxAngle'],
