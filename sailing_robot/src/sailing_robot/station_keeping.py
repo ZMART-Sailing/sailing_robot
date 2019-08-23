@@ -18,7 +18,7 @@ def angleAbsDistance(a, b):
 
 
 class StationKeeping(taskbase.ComplexTaskBase):
-    def __init__(self, nav, marker, radius = 5, accept_radius = 3, linger = 300, threshold = 10, marker_id = None,
+    def __init__(self, nav, marker, radius = 5, accept_radius = 15, linger = 300, marker_id = None,
                  kind = 'keep_station', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
 
@@ -37,7 +37,6 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.marker_id = marker_id
         self.marker_xy = Point(self.nav.latlon_to_utm(self.marker.lat.decimal_degree, self.marker.lon.decimal_degree))
         self.linger = linger
-        self.threshold = threshold
         self.radius = radius / 1000.0
         self.accept_radius = accept_radius
         self.start_time = None
@@ -61,9 +60,10 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.calculate_waypoint()
 
     def check_position(self):
-        if self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius:
+        if self.start_time is None and self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius:
+            self.start_time = time.time()
+        if self.nav.position_ll.distance(self.marker) * 1000 <= self.radius:
             self.nav.direct = True
-            self.nav.task_direct_rudder_control = -40
             _, hwp = self.nav.distance_and_heading(self.marker_xy)
             hwp -= self.nav.heading
             if hwp < -180:
@@ -74,8 +74,6 @@ class StationKeeping(taskbase.ComplexTaskBase):
             if abs(self.nav.task_direct_rudder_control) > 40:
                 self.nav.task_direct_rudder_control = 40 if self.nav.task_direct_rudder_control > 0 else -40
             self.nav.task_direct_sailsheet_normalized = 0
-            if self.start_time is None:
-                self.start_time = time.time()
         else:
             self.nav.direct = False
             self.nav.task_direct_rudder_control = 0

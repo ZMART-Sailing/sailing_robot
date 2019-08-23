@@ -69,6 +69,7 @@ if __name__ == '__main__':
         # tasks = rospy.get_param("tasks")
         nav_options = rospy.get_param("navigation")
         nav = Navigation(**nav_options)
+        nav.rudder_param = rospy.get_param('rudder')
         tasks_runner = make_ros_tasks_runner(rospy.get_param("wp"), nav)
 
         rospy.Subscriber('heading', Float32, nav.update_heading)

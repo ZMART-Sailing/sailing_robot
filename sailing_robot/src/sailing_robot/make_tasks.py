@@ -4,6 +4,7 @@ import heading_planning_laylines
 import heading_planning_laylines_closely
 import heading_planning_station_keeping
 import station_keeping
+import station_keeping_obstacle
 import return_to_safety
 import jibe_tack_now
 import timeout
@@ -13,6 +14,7 @@ build_task_dict = {
     'to_waypoint_close': heading_planning_laylines_closely.HeadingPlan,
     'keep_station_to_waypoint': heading_planning_station_keeping.HeadingPlan,
     'keep_station': station_keeping.StationKeeping,
+    'keep_station_obstacle': station_keeping_obstacle.StationKeeping,
     'return_to_safety_zone': return_to_safety.ReturnToSafetyZone,
     'start_timer': timeout.StartTimer,
     'jibe_tack_now': jibe_tack_now.JibeTackNow
@@ -29,6 +31,8 @@ def expand_task(taskdict, nav, name = '', index = None):
     if index is not None:
         name += '_' + str(index)
     if kind in build_task_dict:
+        print kind
+        print taskdict
         task = build_task_dict[kind](nav = nav, name = name, **taskdict)
     else:
         raise ValueError("Unknown task type: {}".format(kind))

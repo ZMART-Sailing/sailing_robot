@@ -1,6 +1,6 @@
 import LatLon
 
-expand_task_list = ['to_waypoint', 'to_waypoint_close', 'keep_station']
+expand_task_list = ['to_waypoint', 'to_waypoint_close', 'keep_station', 'keep_station_obstacle']
 
 
 def expand_id(wp_params):
@@ -47,8 +47,8 @@ def expand_task_dict(wp_params):
             kind = wp_task['kind']
             expanded_task = {
                 'kind': kind,
-                'target_radius': wp_task.get('accept_radius', target_radius),
-                'tack_voting_radius': wp_task.get('accept_radius', tack_voting_radius)
+                'target_radius': wp_task.get('target_radius', target_radius),
+                'tack_voting_radius': wp_task.get('tack_voting_radius', tack_voting_radius)
             }
             if kind == 'to_waypoint':
                 expanded_task.update({
@@ -58,16 +58,25 @@ def expand_task_dict(wp_params):
                 expanded_task.update({
                     'waypoint': LatLon.LatLon(*wp_task['waypoint']),
                     'waypoint_id': wp_task.get('waypoint_id', None),
-                    'close_factor': wp_task.get('accept_radius', 0.8)
+                    'close_factor': wp_task.get('close_factor', 0.8)
                 })
             elif kind == 'keep_station':
                 expanded_task.update({
                     'marker': LatLon.LatLon(*wp_task['waypoint']),
                     'marker_id': wp_task['waypoint_id'],
                     'linger': wp_task.get('linger', 300),
-                    'radius': wp_task.get('radius', 5),
-                    'threshold': wp_task.get('threshold', 10),
-                    'accept_radius': wp_task.get('radius', 3)
+                    'radius': wp_task.get('radius', 3),
+                    'accept_radius': wp_task.get('accept_radius', 15)
+                })
+            elif kind == 'keep_station_obstacle':
+                expanded_task.update({
+                    'marker': LatLon.LatLon(*wp_task['waypoint']),
+                    'marker_id': wp_task['waypoint_id'],
+                    'linger': wp_task.get('linger', 180),
+                    'radius': wp_task.get('radius', 3),
+                    'min_radius': wp_task.get('min_radius', 1),
+                    'max_radius': wp_task.get('max_radius', 5),
+                    'accept_radius': wp_task.get('accept_radius', 20)
                 })
             elif kind == 'start_timer':
                 expanded_task = wp_task.copy()

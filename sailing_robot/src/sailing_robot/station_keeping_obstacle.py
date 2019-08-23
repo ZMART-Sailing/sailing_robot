@@ -19,8 +19,8 @@ def angleAbsDistance(a, b):
 
 
 class StationKeeping(taskbase.ComplexTaskBase):
-    def __init__(self, nav, marker, rudder_param, radius = 5, accept_radius = 3, linger = 300, threshold = 10, \
-                 marker_id = None, kind = 'keep_station', name = '', *args, **kwargs):
+    def __init__(self, nav, marker, radius = 3, min_radius = 1, max_radius = 5, accept_radius = 15, linger = 180,
+                 marker_id = None, kind = 'keep_station_obstacle', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
 
         This is meant to be started when we're already close to the marker; we'll
@@ -38,17 +38,18 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.marker_id = marker_id
         self.marker_xy = Point(self.nav.latlon_to_utm(self.marker.lat.decimal_degree, self.marker.lon.decimal_degree))
         self.linger = linger
-        self.threshold = threshold
-        self.radius = radius / 1000.0
+        self.radius = radius
+        self.min_radius = min_radius
+        self.max_radius = max_radius
         self.accept_radius = accept_radius
         self.start_time = None
         self.name = name
-        self.debug_topics = [('dbg_keep_station_waypoint', 'String'), ]
         super(StationKeeping, self).__init__(**kwargs)
         self.last_wind_direction = None
 
-        self.controller = PID(rudder_param['control']['Kp'], rudder_param['control']['Ki'],
-                              rudder_param['control']['Kd'], rudder_param['maxAngle'], -rudder_param['maxAngle'])
+        self.controller = PID(self.nav.rudder_param['control']['Kp'], self.nav.rudder_param['control']['Ki'],
+                              self.nav.rudder_param['control']['Kd'], self.nav.rudder_param['maxAngle'],
+                              -self.nav.rudder_param['maxAngle'])
 
     def calculate_waypoint_ll(self):
         return [self.marker]
@@ -65,16 +66,18 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.calculate_waypoint()
 
     def check_position(self):
-        if self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius:
+        if self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius and self.start_time is None:
+            self.start_time = time.time()
+        if self.nav.position_ll.distance(self.marker) * 1000 <= self.max_radius:
             self.nav.direct = True
-            self.nav.task_direct_rudder_control = -40
-            _, hwp = self.nav.distance_and_heading(self.marker_xy)
+            dwp, hwp = self.nav.distance_and_heading(self.marker_xy)
             hwp -= self.nav.heading
             if hwp < -180:
                 hwp += 360
             if hwp > 180:
                 hwp -= 360
-            self.nav.task_direct_rudder_control = hwp * 4.0 / 3
+            self.nav.task_direct_rudder_control = self.controller.update_PID(dwp - self.radius)
+            self.nav.task_direct_rudder_control *= 1 if hwp > 0 else -1
             if abs(self.nav.task_direct_rudder_control) > 40:
                 self.nav.task_direct_rudder_control = 40 if self.nav.task_direct_rudder_control > 0 else -40
             self.nav.task_direct_sailsheet_normalized = 0
