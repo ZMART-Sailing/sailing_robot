@@ -51,7 +51,10 @@ class StationKeeping(taskbase.ComplexTaskBase):
 
     def calculate_waypoint(self, waypoints_ll = None):
         waypoints, waypoints_ll = super(StationKeeping, self).calculate_waypoint(waypoints_ll)
-        self.taskdict['list'] = waypoints
+        self.taskdict['tasks'] = [{
+            'kind': 'to_waypoint_close',
+            'waypoint': [waypoints_ll[0].lat.decimal_degree, waypoints_ll[0].lon.decimal_degree]
+        }]
         return waypoints, waypoints_ll
 
     def calculate_tasks(self):
@@ -62,8 +65,14 @@ class StationKeeping(taskbase.ComplexTaskBase):
             self.nav.direct = True
             self.nav.task_direct_rudder_control = -40
             _, hwp = self.nav.distance_and_heading(self.marker_xy)
-            if 90 < hwp < 270:
-                self.nav.task_direct_rudder_control = -self.nav.task_direct_rudder_control
+            hwp -= self.nav.heading
+            if hwp < -180:
+                hwp += 360
+            if hwp > 180:
+                hwp -= 360
+            self.nav.task_direct_rudder_control = hwp * 4.0 / 3
+            if abs(self.nav.task_direct_rudder_control) > 40:
+                self.nav.task_direct_rudder_control = 40 if self.nav.task_direct_rudder_control > 0 else -40
             self.nav.task_direct_sailsheet_normalized = 0
             if self.start_time is None:
                 self.start_time = time.time()
@@ -71,7 +80,6 @@ class StationKeeping(taskbase.ComplexTaskBase):
             self.nav.direct = False
             self.nav.task_direct_rudder_control = 0
             self.nav.task_direct_sailsheet_normalized = 0
-            self.start_time = None
 
     def need_update(self):
         return False

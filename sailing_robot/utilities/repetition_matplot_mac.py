@@ -80,16 +80,26 @@ def update_param(obj):
                     obj.wp_array = np.array(obj.wp_array).T  # [lat, lon]
                     obj.origin = obj.wp_array.mean(axis = 1, keepdims = True)
                     obj.wp_array -= obj.origin
+                    obj.maxwpdist = obj.wp_array
+
                     if obj.dbg_keep_station_waypoint is not None and obj.dbg_keep_station_waypoint != '':
                         obj.dbg_keep_station_waypoint = np.array(obj.dbg_keep_station_waypoint).T
                         obj.dbg_keep_station_waypoint -= obj.origin
-                        # print obj.wp_array
+                        # print obj.maxwpdist
                         # print obj.dbg_keep_station_waypoint
-                        obj.maxwpdist = np.abs(
-                            np.concatenate((obj.wp_array, obj.dbg_keep_station_waypoint), axis = 0)).max(axis = 1)
+                        obj.maxwpdist = np.concatenate((obj.maxwpdist, obj.dbg_keep_station_waypoint), axis = 1)
                     else:
                         obj.dbg_keep_station_waypoint = None
-                        obj.maxwpdist = np.abs(obj.wp_array).max(axis = 1)
+
+                    if obj.dbg_real_waypoint is not None and obj.dbg_real_waypoint != '':
+                        obj.dbg_real_waypoint = np.array(obj.dbg_real_waypoint).T
+                        obj.dbg_real_waypoint -= obj.origin
+                        # print obj.maxwpdist
+                        # print obj.dbg_real_waypoint
+                        obj.maxwpdist = np.concatenate((obj.maxwpdist, obj.dbg_real_waypoint), axis = 1)
+                    else:
+                        obj.dbg_real_waypoint = None
+                    obj.maxwpdist = np.abs(obj.maxwpdist).max(axis = 1)
                     obj.origin = obj.origin.flatten()
                     obj.position -= obj.origin
                     obj.position_history.append(obj.position)
@@ -130,6 +140,7 @@ class Debugging_2D_matplot():
         self.image = None
 
         self.dbg_keep_station_waypoint = None
+        self.dbg_real_waypoint = None
 
         thread.start_new_thread(update_param, (self,))
 
@@ -143,6 +154,7 @@ class Debugging_2D_matplot():
         # display Waypoints
         self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c = C[3])
         self.wp_update_fig = None
+        self.wp_update_real_waypoint_fig = None
 
         plt.tight_layout()
         self.ax = plt.subplot(111)
@@ -250,11 +262,17 @@ class Debugging_2D_matplot():
 
         # display Waypoints
         # print self.dbg_keep_station_waypoint
+        if self.wp_update_fig is not None:
+            self.wp_update_fig.set_visible(False)
         if self.dbg_keep_station_waypoint is not None:
-            if self.wp_update_fig is not None:
-                self.wp_update_fig.set_visible(False)
             self.wp_update_fig = plt.scatter(self.dbg_keep_station_waypoint[0], self.dbg_keep_station_waypoint[1],
                                              c = C[9])
+        # print self.dbg_keep_station_waypoint
+        if self.wp_update_real_waypoint_fig is not None:
+            self.wp_update_real_waypoint_fig.set_visible(False)
+        if self.dbg_real_waypoint is not None:
+            self.wp_update_real_waypoint_fig = plt.scatter(self.dbg_real_waypoint[0], self.dbg_real_waypoint[1],
+                                                           c = C[9])
 
         self.update_window(i)
         if self.has_bg_img:

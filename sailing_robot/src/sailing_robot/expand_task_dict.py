@@ -1,5 +1,7 @@
 import LatLon
 
+expand_task_list = ['to_waypoint', 'to_waypoint_close', 'keep_station']
+
 
 def expand_id(wp_params):
     if 'table' not in wp_params:
@@ -9,7 +11,7 @@ def expand_id(wp_params):
         # Long specification: list of tasks
         for wp_task in wp_params['tasks']:
             kind = wp_task['kind']
-            if kind == 'to_waypoint' or kind == 'keep_station':
+            if kind in expand_task_list:
                 if isinstance(wp_task['waypoint'], str):
                     wp_task['waypoint_id'] = wp_task['waypoint']
                     wp_task['waypoint'] = coordinates[wp_task['waypoint']]
@@ -43,26 +45,30 @@ def expand_task_dict(wp_params):
         # Long specification: list of tasks
         for wp_task in wp_params['tasks']:
             kind = wp_task['kind']
+            expanded_task = {
+                'kind': kind,
+                'target_radius': wp_task.get('accept_radius', target_radius),
+                'tack_voting_radius': wp_task.get('accept_radius', tack_voting_radius)
+            }
             if kind == 'to_waypoint':
-                expanded_task = {
-                    'kind': 'to_waypoint',
+                expanded_task.update({
+                    'waypoint': LatLon.LatLon(*wp_task['waypoint']), 'waypoint_id': wp_task.get('waypoint_id', None)
+                })
+            elif kind == 'to_waypoint_close':
+                expanded_task.update({
                     'waypoint': LatLon.LatLon(*wp_task['waypoint']),
-                    'waypoint_id': wp_task['waypoint_id'],
-                    'target_radius': wp_task.get('accept_radius', target_radius),
-                    'tack_voting_radius': wp_task.get('accept_radius', tack_voting_radius)
-                }
+                    'waypoint_id': wp_task.get('waypoint_id', None),
+                    'close_factor': wp_task.get('accept_radius', 0.8)
+                })
             elif kind == 'keep_station':
-                expanded_task = {
-                    'kind': 'keep_station',
+                expanded_task.update({
                     'marker': LatLon.LatLon(*wp_task['waypoint']),
                     'marker_id': wp_task['waypoint_id'],
                     'linger': wp_task.get('linger', 300),
                     'radius': wp_task.get('radius', 5),
                     'threshold': wp_task.get('threshold', 10),
-                    'accept_radius': wp_task.get('radius', 3),
-                    'tack_voting_radius': wp_task.get('accept_radius', tack_voting_radius),
-                    'target_radius': wp_task.get('accept_radius', target_radius)
-                }
+                    'accept_radius': wp_task.get('radius', 3)
+                })
             elif kind == 'start_timer':
                 expanded_task = wp_task.copy()
             else:

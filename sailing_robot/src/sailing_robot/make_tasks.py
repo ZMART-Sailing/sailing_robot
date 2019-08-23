@@ -1,6 +1,7 @@
 import expand_task_dict
 
 import heading_planning_laylines
+import heading_planning_laylines_closely
 import heading_planning_station_keeping
 import station_keeping
 import return_to_safety
@@ -9,6 +10,7 @@ import timeout
 
 build_task_dict = {
     'to_waypoint': heading_planning_laylines.HeadingPlan,
+    'to_waypoint_close': heading_planning_laylines_closely.HeadingPlan,
     'keep_station_to_waypoint': heading_planning_station_keeping.HeadingPlan,
     'keep_station': station_keeping.StationKeeping,
     'return_to_safety_zone': return_to_safety.ReturnToSafetyZone,
