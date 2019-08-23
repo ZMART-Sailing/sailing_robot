@@ -67,7 +67,6 @@ namespace  {
   float pos[3];
   rs2::frame color_frame;
   sensor_msgs::NavSatFix nav_sub = sensor_msgs::NavSatFix();
-  sensor_msgs::NavSatFix last_nav = sensor_msgs::NavSatFix();
   sensor_msgs::NavSatFix cur_nav = sensor_msgs::NavSatFix();
 }
 
@@ -125,6 +124,7 @@ int main(int argc, char* argv[])
     // cout << "begin" << ros::Time::now() << endl;
     //如果被上锁了，直接sleep这一帧
     if (depth_lock) {
+      ros::spinOnce();
       // cout << "locked" << endl;
     }
 
@@ -180,13 +180,13 @@ int main(int argc, char* argv[])
             boat_and_ball_msg.heading = 0;
             boat_and_ball_msg.depth = 0;
           }
-          boat_and_ball_msg.boat_pos = last_nav;
+          boat_and_ball_msg.boat_pos = cur_nav;
         }
         else {
           boat_and_ball_msg.isDetected = false;
           boat_and_ball_msg.heading = 0;
           boat_and_ball_msg.depth = 0;
-          boat_and_ball_msg.boat_pos = last_nav;
+          boat_and_ball_msg.boat_pos = cur_nav;
         }
         boat_and_ball_pub.publish(boat_and_ball_msg);
 
@@ -200,17 +200,12 @@ int main(int argc, char* argv[])
       }
       //继续上锁
       depth_lock = true;
+      ros::spinOnce();
+      cur_nav = nav_sub;
     }
-    cout << frame_cnt << endl;
     //sleep
-    // cout << "spin : " << ros::Time::now() << endl;
-    ros::spinOnce();
-    last_nav = cur_nav;
-    cur_nav = nav_sub;
-    // cout << "finish : " << ros::Time::now() << endl;
     loop_rate.sleep();
 
-    // cout << "end : " << ros::Time::now() << endl;
   }
     return 0;
 }
