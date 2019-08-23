@@ -18,24 +18,24 @@ def angleAbsDistance(a, b):
 
 
 class StationKeeping(taskbase.ComplexTaskBase):
-    def __init__(self, nav, marker, radius = 5, accept_radius = 15, linger = 300, marker_id = None,
+    def __init__(self, nav, waypoint, radius = 5, accept_radius = 15, linger = 300, waypoint_id = None,
                  kind = 'keep_station', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
 
-        This is meant to be started when we're already close to the marker; we'll
-        normally put it immediately after a to_waypoint task to go to the marker.
+        This is meant to be started when we're already close to the waypoint; we'll
+        normally put it immediately after a to_waypoint task to go to the waypoint.
 
         nav : a Navigation object for common machinery.
-        marker_ll : a (lat, lon) point marking where we'll try to stay close to.
+        waypoint_ll : a (lat, lon) point marking where we'll try to stay close to.
         linger : time in seconds to stay there
-        radius : distance in metres which we'll try to bounce around the marker
+        radius : distance in metres which we'll try to bounce around the waypoint
         wind_angle : the absolute wind angle to sail (in degrees) when inside
            radius. This will automatically be flipped according to the tack.
         """
         self.nav = nav
-        self.marker = marker
-        self.marker_id = marker_id
-        self.marker_xy = Point(self.nav.latlon_to_utm(self.marker.lat.decimal_degree, self.marker.lon.decimal_degree))
+        self.waypoint = waypoint
+        self.waypoint_id = waypoint_id
+        self.waypoint_xy = Point(self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
         self.linger = linger
         self.radius = radius / 1000.0
         self.accept_radius = accept_radius
@@ -46,7 +46,7 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.last_wind_direction = None
 
     def calculate_waypoint_ll(self):
-        return [self.marker]
+        return [self.waypoint]
 
     def calculate_waypoint(self, waypoints_ll = None):
         waypoints, waypoints_ll = super(StationKeeping, self).calculate_waypoint(waypoints_ll)
@@ -60,11 +60,11 @@ class StationKeeping(taskbase.ComplexTaskBase):
         self.calculate_waypoint()
 
     def check_position(self):
-        if self.start_time is None and self.nav.position_ll.distance(self.marker) * 1000 <= self.accept_radius:
+        if self.start_time is None and self.nav.position_ll.distance(self.waypoint) * 1000 <= self.accept_radius:
             self.start_time = time.time()
-        if self.nav.position_ll.distance(self.marker) * 1000 <= self.radius:
+        if self.nav.position_ll.distance(self.waypoint) * 1000 <= self.radius:
             self.nav.direct = True
-            _, hwp = self.nav.distance_and_heading(self.marker_xy)
+            _, hwp = self.nav.distance_and_heading(self.waypoint_xy)
             hwp -= self.nav.heading
             if hwp < -180:
                 hwp += 360
