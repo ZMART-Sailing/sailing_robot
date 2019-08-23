@@ -8,29 +8,29 @@ import heading_planning_laylines
 
 
 class StationKeeping(taskbase.TaskBase):
-    def __init__(self, nav, marker_ll, linger = 300, radius = 5, wind_angle = 75, *args, **kwargs):
+    def __init__(self, nav, waypoint_ll, linger = 300, radius = 5, wind_angle = 75, *args, **kwargs):
         """Machinery to stay near a given point.
         
-        This is meant to be started when we're already close to the marker; we'll
-        normally put it immediately after a to_waypoint task to go to the marker.
+        This is meant to be started when we're already close to the waypoint; we'll
+        normally put it immediately after a to_waypoint task to go to the waypoint.
 
         nav : a Navigation object for common machinery.
-        marker_ll : a (lat, lon) point marking where we'll try to stay close to.
+        waypoint_ll : a (lat, lon) point marking where we'll try to stay close to.
         linger : time in seconds to stay there
-        radius : distance in metres which we'll try to bounce around the marker
+        radius : distance in metres which we'll try to bounce around the waypoint
         wind_angle : the absolute wind angle to sail (in degrees) when inside
            radius. This will automatically be flipped according to the tack.
         """
         self.nav = nav
-        self.marker_ll = marker_ll
-        self.marker = Point(self.nav.latlon_to_utm(*marker_ll))
+        self.waypoint_ll = waypoint_ll
+        self.waypoint = Point(self.nav.latlon_to_utm(*waypoint_ll))
         self.linger = linger
         self.radius = radius
         self.wind_angle = wind_angle
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
         self.start_time = 0
-        self.head_to_waypoint = heading_planning_laylines.HeadingPlan(nav, LatLon(*marker_ll), target_radius = radius,
+        self.head_to_waypoint = heading_planning_laylines.HeadingPlan(nav, LatLon(*waypoint_ll), target_radius = radius,
                                                                       tack_voting_radius = radius)
 
     debug_topics = [('dbg_heading_to_waypoint', 'Float32'), ('dbg_distance_to_waypoint', 'Float32'),
@@ -51,7 +51,7 @@ class StationKeeping(taskbase.TaskBase):
     def calculate_state_and_goal(self):
         """Work out what we want the boat to do
         """
-        dwp, hwp = self.nav.distance_and_heading(self.marker)
+        dwp, hwp = self.nav.distance_and_heading(self.waypoint)
         if dwp > self.radius:
             return self.head_to_waypoint.calculate_state_and_goal()
 

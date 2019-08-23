@@ -4,6 +4,7 @@ This has almost no implementation; the debugging methods are injected by
 tasks_ros. This allows us to test task classes outside ROS.
 """
 
+import make_ros_tasks
 import make_ros_tasks_runner
 
 
@@ -30,6 +31,44 @@ class TaskBase(object):
 
 
 class ComplexTaskBase(TaskBase):
+    def __init__(self, *args, **kwargs):
+        self.taskdict = kwargs
+        self.calculate_tasks()
+        self.heading_plan = make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/heading_plan')
+
+    def calculate_waypoint_ll(self):
+        pass
+
+    def calculate_waypoint(self, waypoints_ll = None):
+        if waypoints_ll is None:
+            waypoints_ll = self.calculate_waypoint_ll()
+        return (waypoints_ll.lat.decimal_degree, waypoints_ll.lon.decimal_degree), waypoints_ll
+
+    def calculate_tasks(self):
+        self.taskdict['list'] = [self.calculate_waypoint()[0]]
+
+    def need_update(self):
+        return True
+
+    def update_tasks(self, waypoint = None, waypoint_id = None, target_radius = None):
+        if waypoint is not None:
+            self.heading_plan.update_waypoint(waypoint, waypoint_id)
+        if target_radius is not None:
+            self.heading_plan.update_target_radius(target_radius)
+
+    def check_position(self):
+        pass
+
+    def calculate_state_and_goal(self):
+        """Work out what we want the boat to do
+        """
+        if self.need_update():
+            self.update_tasks()
+        self.check_position()
+        return self.heading_plan.calculate_state_and_goal()
+
+
+class TaskRunnerBasedTaskBase(TaskBase):
     def __init__(self, *args, **kwargs):
         self.taskdict = kwargs
         self.calculate_tasks()
