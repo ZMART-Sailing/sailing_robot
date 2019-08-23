@@ -123,10 +123,12 @@ int main(int argc, char* argv[])
     frame_cnt += 1;
     //如果被上锁了，直接sleep这一帧
     if (depth_lock) {
+      cout << "locked" << endl;
       ros::spinOnce();
     }
 
     else {
+      cout << "unlock" << endl;
       rs2::frameset frameset = pipe.wait_for_frames();
       //取深度图和彩色图
       rs2::frame color_frame = frameset.get_color_frame();
@@ -163,18 +165,14 @@ int main(int argc, char* argv[])
         ball_detect::BoatAndBall boat_and_ball_msg;
         if (isDetected) {
           float depth_pixel[2];
+          cout << "center = " << center[0] << " " << center[1] << endl;
           rs2_project_color_pixel_to_depth_pixel(depth_pixel, data, depth_scale, DEPTH_MIN, DEPTH_MAX, \
                                                          &depth_intrin, &color_intrin, &c2dextrin, &d2cextrin, center);
-          if(pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth)) {
-            boat_and_ball_msg.isDetected = true;
-            boat_and_ball_msg.heading = heading;
-            boat_and_ball_msg.distance = depth;
-          }
-          else {
-            boat_and_ball_msg.isDetected = false;
-            boat_and_ball_msg.heading = 0;
-            boat_and_ball_msg.distance = 0;
-          }
+          pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth);
+          boat_and_ball_msg.isDetected = true;
+          boat_and_ball_msg.heading = heading;
+          boat_and_ball_msg.distance = depth;
+
           boat_and_ball_msg.boat_pos = cur_nav;
         }
         else {
@@ -291,6 +289,7 @@ bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, 
 {
  float upoint[3];
  pixel2Point(frame, intrin, upixel, upoint, depth);
+ cout << "depth = " << depth << endl;
  if (abs(upoint[2]) < EPSILON) {
    return false;
  }

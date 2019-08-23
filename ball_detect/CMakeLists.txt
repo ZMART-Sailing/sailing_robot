@@ -71,7 +71,7 @@ include_directories(
 ## The recommended prefix ensures that target names across packages don't collide
  add_executable(color_detect src/color_detect_node.cpp)
  add_executable(yolo_detect src/yolo_detect_node.cpp)
-
+ add_executable(sim_gps src/simulator_gps.cpp)
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -83,4 +83,8 @@ include_directories(
  target_link_libraries(yolo_detect
    ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${realsense2_LIBRARY}
  )
+ target_link_libraries(sim_gps
+  ${catkin_LIBRARIES}
+)
+
 
