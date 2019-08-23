@@ -1,7 +1,6 @@
 """Common navigation machinery used by different modules"""
 
 import math
-import collections
 from LatLon import LatLon
 from pyproj import Proj
 from shapely.geometry import Point, Polygon
@@ -53,14 +52,14 @@ class Navigation(object):
         self.ball_position = None
 
     def update_boat_and_ball(self, msg):
-        self.detected = msg.isDetected.data
         self.boat_position = LatLon(msg.boat_pos.latitude, msg.boat_pos.longitude)
-        self.relative_position_distance = (msg.ball_pos.x ** 2 + msg.ball_pos.y ** 2 + msg.ball_pos.z ** 2) ** 0.5
-        self.relative_position_heading = math.atan2(msg.ball_pos.z, msg.ball_pos.x) + self.heading
+        self.relative_position_distance = msg.distance.data
+        self.relative_position_heading = msg.heading.data + self.heading
         if self.relative_position_heading > 360:
             self.relative_position_heading -= 360
         self.relative_position = self.boat_position.offset(self.relative_position_heading,
                                                            self.relative_position_distance)
+        self.detected = msg.isDetected.data and 0.5 < self.relative_position_distance < 5
         if len(self.detected_list) == 20:
             pop = self.detected_list.pop(0)
             if pop:

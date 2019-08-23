@@ -173,19 +173,19 @@ int main(int argc, char* argv[])
           if(pixel2Heading(&depth_frame, &depth_intrin, depth_pixel, heading, depth)) {
             boat_and_ball_msg.isDetected = true;
             boat_and_ball_msg.heading = heading;
-            boat_and_ball_msg.depth = depth;
+            boat_and_ball_msg.distance = depth;
           }
           else {
             boat_and_ball_msg.isDetected = false;
             boat_and_ball_msg.heading = 0;
-            boat_and_ball_msg.depth = 0;
+            boat_and_ball_msg.distance = 0;
           }
           boat_and_ball_msg.boat_pos = cur_nav;
         }
         else {
           boat_and_ball_msg.isDetected = false;
           boat_and_ball_msg.heading = 0;
-          boat_and_ball_msg.depth = 0;
+          boat_and_ball_msg.distance = 0;
           boat_and_ball_msg.boat_pos = cur_nav;
         }
         boat_and_ball_pub.publish(boat_and_ball_msg);
