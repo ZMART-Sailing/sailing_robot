@@ -1,4 +1,5 @@
 <launch>
+	<!-- <include file = "$(find darknet_ros)/launch/darknet_ros.launch" /> -->
 	<arg name = "show" default = "false" />
 	<!-- <include file="$(find correction_receiver_ros)/launch/correction_receiver_ros.launch"/> -->
 	<node name = "sim_gps" pkg = "ball_detect" type = "sim_gps" respawn = "true" output = "screen" />
