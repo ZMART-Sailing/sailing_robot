@@ -58,5 +58,5 @@
     <!--node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/-->
 
     <node name="debugging_dashboard" pkg="sailing_robot" type="debugging_dashboard"/>
-    <node name ="rosbag_record" pkg = "rosbag" type = "record" respawn = "true" args = "-a -o /home/zmart/sailing_robot" /> 
+<!--    <node name ="rosbag_record" pkg = "rosbag" type = "record" respawn = "true" args = "-a -o /home/zmart/sailing_robot" /> -->
 </launch>
