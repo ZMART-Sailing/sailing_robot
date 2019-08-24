@@ -1,9 +1,16 @@
 import heading_planning_laylines
+import json
 
 
 class HeadingPlan(heading_planning_laylines.HeadingPlan):
+    def __init__(self, *args, **kwargs):
+        super(HeadingPlan, self).__init__(*args, **kwargs)
+        self.debug_topics.append(('dbg_real_waypoint', 'String'))
 
     def calculate_state_and_goal(self):
         if len(self.nav.relative_position_list) > 0:
-            self.update_waypoint(self.nav.calculate_ball_position())
+            self.nav.calculate_ball_position()
+            self.debug_pub('dbg_real_waypoint', json.dumps(
+                [self.nav.ball_position.lat.decimal_degree, self.nav.ball_position.lon.decimal_degree]))
+            self.update_waypoint(self.nav.ball_position)
         return super(HeadingPlan, self).calculate_state_and_goal()
