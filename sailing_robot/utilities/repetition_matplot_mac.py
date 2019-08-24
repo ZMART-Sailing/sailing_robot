@@ -99,6 +99,16 @@ def update_param(obj):
                         obj.maxwpdist = np.concatenate((obj.maxwpdist, obj.dbg_real_waypoint), axis = 1)
                     else:
                         obj.dbg_real_waypoint = None
+
+                    if obj.dbg_ball_position is not None and obj.dbg_ball_position != '':
+                        obj.dbg_ball_position = np.array(obj.dbg_ball_position).T
+                        obj.dbg_ball_position -= obj.origin
+                        # print obj.maxwpdist
+                        # print obj.dbg_ball_position
+                        obj.maxwpdist = np.concatenate((obj.maxwpdist, obj.dbg_ball_position), axis = 1)
+                    else:
+                        obj.dbg_ball_position = None
+
                     obj.maxwpdist = np.abs(obj.maxwpdist).max(axis = 1)
                     obj.origin = obj.origin.flatten()
                     obj.position -= obj.origin
@@ -141,6 +151,7 @@ class Debugging_2D_matplot():
 
         self.dbg_keep_station_waypoint = None
         self.dbg_real_waypoint = None
+        self.dbg_ball_position = None
 
         thread.start_new_thread(update_param, (self,))
 
@@ -155,6 +166,7 @@ class Debugging_2D_matplot():
         self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c = C[3])
         self.wp_update_fig = None
         self.wp_update_real_waypoint_fig = None
+        self.wp_update_ball_position_fig = None
 
         plt.tight_layout()
         self.ax = plt.subplot(111)
@@ -267,11 +279,18 @@ class Debugging_2D_matplot():
         if self.dbg_keep_station_waypoint is not None:
             self.wp_update_fig = plt.scatter(self.dbg_keep_station_waypoint[0], self.dbg_keep_station_waypoint[1],
                                              c = C[9])
-        # print self.dbg_keep_station_waypoint
+
+        # print self.dbg_real_waypoint
         if self.wp_update_real_waypoint_fig is not None:
             self.wp_update_real_waypoint_fig.set_visible(False)
         if self.dbg_real_waypoint is not None:
             self.wp_update_real_waypoint_fig = plt.scatter(self.dbg_real_waypoint[0], self.dbg_real_waypoint[1],
+                                                           c = C[9])
+        # print self.dbg_ball_position
+        if self.wp_update_ball_position_fig is not None:
+            self.wp_update_ball_position_fig.set_visible(False)
+        if self.dbg_ball_position is not None:
+            self.wp_update_ball_position_fig = plt.scatter(self.dbg_ball_position[0], self.dbg_ball_position[1],
                                                            c = C[9])
 
         self.update_window(i)

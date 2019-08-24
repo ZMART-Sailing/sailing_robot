@@ -51,6 +51,9 @@ class Client_tcp():
         rospy.Subscriber('dbg_real_waypoint', String, self.update_dbg_real_waypoint)
         self.dbg_real_waypoint = ''
 
+        rospy.Subscriber('dbg_ball_position', String, self.update_dbg_ball_position)
+        self.dbg_ball_position = ''
+
         self.freq = rospy.get_param("config/rate")
         self.rate = rospy.Rate(self.freq)
 
@@ -80,6 +83,9 @@ class Client_tcp():
                                           self.dbg_keep_station_waypoint]
 
     def update_dbg_real_waypoint(self, msg):
+        self.dbg_real_waypoint = [self.nav.latlon_to_utm(*json.loads(msg.data))]
+
+    def update_dbg_ball_position(self, msg):
         self.dbg_real_waypoint = [self.nav.latlon_to_utm(*json.loads(msg.data))]
 
     def client_tcp_send(self):
