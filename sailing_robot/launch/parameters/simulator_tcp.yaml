@@ -10,6 +10,7 @@
 # downwind: 6, 7
 wp/tasks: [
 {"kind": "to_waypoint", "waypoint": "1"},
+{"kind": "to_waypoint_keep_station_obstacle", "waypoint": "2"},
 {"kind": "to_waypoint_close", "waypoint": "2"},
 {"kind": "keep_station", "waypoint": "3"},
 {"kind": "keep_station_obstacle", "waypoint": "4"}

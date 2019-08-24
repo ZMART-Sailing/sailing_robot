@@ -47,9 +47,9 @@ def expand_task_dict(wp_params):
                 'tack_voting_radius': wp_task.get('tack_voting_radius', tack_voting_radius)
             }
             if kind == 'to_waypoint':
-                expanded_task.update({
-                    'waypoint': LatLon.LatLon(*wp_task['waypoint']), 'waypoint_id': wp_task.get('waypoint_id', None)
-                })
+                pass
+            elif kind == 'to_waypoint_keep_station_obstacle':
+                pass
             elif kind == 'to_waypoint_close':
                 expanded_task.update({
                     'close_factor': wp_task.get('close_factor', 0.8)
