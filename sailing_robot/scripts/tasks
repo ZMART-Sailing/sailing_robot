@@ -77,7 +77,7 @@ if __name__ == '__main__':
         rospy.Subscriber('heading', Float32, nav.update_heading)
         rospy.Subscriber('wind_direction_apparent', Float64, nav.update_wind_direction)
         rospy.Subscriber('position', NavSatFix, nav.update_position)
-        rospy.Subscriber('boat_and_ball', BoatAndBall, nav.update_boat_and_ball)
+        rospy.Subscriber('/yolo_detection/boat_and_ball', BoatAndBall, nav.update_boat_and_ball)
         rospy.Subscriber('temporary_wp', NavSatFix, insert_waypoint)
         rospy.Subscriber('jibe_tack_now', String, jibe_tack_now)
         srv = Server(TackVotingConfig, tack_voting_callback)
