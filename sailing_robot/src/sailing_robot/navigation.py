@@ -53,12 +53,12 @@ class Navigation(object):
 
     def update_boat_and_ball(self, msg):
         self.boat_position = LatLon(msg.boat_pos.latitude, msg.boat_pos.longitude)
-        self.relative_position_distance = msg.distance / 1000.0
+        self.relative_position_distance = msg.distance
         self.relative_position_heading = msg.heading + self.heading
         if self.relative_position_heading > 360:
             self.relative_position_heading -= 360
         self.relative_position = self.boat_position.offset(self.relative_position_heading,
-                                                           self.relative_position_distance)
+                                                           self.relative_position_distance / 1000.0)
         self.detected = msg.isDetected and 0.5 < self.relative_position_distance < 10
         if len(self.detected_list) == 20:
             pop = self.detected_list.pop(0)
