@@ -35,6 +35,7 @@ class ComplexTaskBase(TaskBase):
         self.taskdict = kwargs
         self.calculate_tasks()
         self.heading_plan = make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/heading_plan')[0]
+        self.debug_topics.extend(self.heading_plan.debug_topics)
 
     def init_ros(self):
         self.heading_plan.debug_pub = self.debug_pub
