@@ -3,7 +3,6 @@ import expand_task_dict
 import heading_planning_laylines
 import heading_planning_laylines_closely
 import heading_planning_station_keeping
-import heading_planning_station_keeping
 import station_keeping
 import station_keeping_obstacle
 import return_to_safety

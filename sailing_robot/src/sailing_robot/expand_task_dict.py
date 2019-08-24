@@ -49,7 +49,9 @@ def expand_task_dict(wp_params):
             if kind == 'to_waypoint':
                 pass
             elif kind == 'to_waypoint_keep_station_obstacle':
-                pass
+                expanded_task.update({
+                    'target_radius': wp_task.get('target_radius', 2)
+                })
             elif kind == 'to_waypoint_close':
                 expanded_task.update({
                     'close_factor': wp_task.get('close_factor', 0.8)

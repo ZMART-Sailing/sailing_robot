@@ -35,7 +35,8 @@ class StationKeeping(taskbase.TaskRunnerBasedTaskBase):
         self.nav = nav
         self.waypoint = waypoint
         self.waypoint_id = waypoint_id
-        self.waypoint_xy = Point(self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
+        self.waypoint_xy = Point(
+            self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
         self.linger = linger
         self.threshold = threshold
         self.radius = radius / 1000.0
@@ -61,7 +62,7 @@ class StationKeeping(taskbase.TaskRunnerBasedTaskBase):
         self.taskdict['list'], _ = self.calculate_waypoint()
 
     def check_position(self):
-        if self.start_time is None and self.nav.position_ll.distance(self.waypoint) <= self.accept_radius:
+        if self.start_time is None and self.nav.position_ll.distance(self.waypoint) < self.accept_radius:
             self.start_time = time.time()
         else:
             self.start_time = None

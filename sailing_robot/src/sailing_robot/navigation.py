@@ -49,6 +49,7 @@ class Navigation(object):
         self.relative_position_distance = None
         self.relative_position = None
         self.relative_position_list = []
+        self.relative_position_weight_list = []
         self.ball_position = None
 
     def update_boat_and_ball(self, msg):
@@ -59,19 +60,24 @@ class Navigation(object):
             self.relative_position_heading -= 360
         self.relative_position = self.boat_position.offset(self.relative_position_heading,
                                                            self.relative_position_distance / 1000.0)
-        self.detected = msg.isDetected and 0.5 < self.relative_position_distance < 7
+        self.detected = msg.isDetected and 0.5 < self.relative_position_distance < 20
         if len(self.detected_list) == 20:
             pop = self.detected_list.pop(0)
             if pop:
                 self.relative_position_list.pop(0)
+                self.relative_position_weight_list.pop(0)
         self.detected_list.append(self.detected)
         if self.detected:
             self.relative_position_list.append(self.relative_position)
+            self.relative_position_weight_list.append(1.0 / (self.relative_position_distance - 0.5))
 
     def calculate_ball_position(self):
-        self.ball_position = LatLon(
-            sum([pos.lat.decimal_degree for pos in self.relative_position_list]) / len(self.relative_position_list),
-            sum([pos.lon.decimal_degree for pos in self.relative_position_list]) / len(self.relative_position_list))
+        weight_sum = sum(self.relative_position_weight_list)
+        self.ball_position = LatLon(sum([pos.lat.decimal_degree * weight for pos, weight in
+                                         zip(self.relative_position_list,
+                                             self.relative_position_weight_list)]) / weight_sum, sum(
+            [pos.lon.decimal_degree * weight for pos, weight in
+             zip(self.relative_position_list, self.relative_position_weight_list)]) / weight_sum)
         return self.ball_position
 
     def update_position(self, msg):
