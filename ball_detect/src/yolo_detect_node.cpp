@@ -282,14 +282,14 @@ void pixel2Point(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, fl
 
 float depthCubicCalibration(const float depth)
 {
-  return 0.0172 * pow(depth, 3) - 0.0814 * pow(depth, 2) + 1.5038 * depth - 0.4396;
+  return 0.1436 * pow(depth, 2) + 0.884 * depth + 0.0501;
 }
 
 bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float upixel[2], float& heading, float& depth)
 {
  float upoint[3];
  pixel2Point(frame, intrin, upixel, upoint, depth);
- // cout << "depth = " << depth << endl;
+ upoint[2] = depthCubicCalibration(upoint[2]);
  if (abs(upoint[2]) < EPSILON) {
    return false;
  }
