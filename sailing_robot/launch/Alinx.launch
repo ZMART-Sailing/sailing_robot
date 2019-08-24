@@ -46,6 +46,11 @@
 <!--    <node name="ser_gps" pkg="sailing_robot" type="ser_gps" output="screen"/>-->
     <!--    base station gps cannot use with pixhawk at same time-->
     <include file="$(find correction_receiver_ros)/launch/correction_receiver_ros.launch"/>
+    <!--    simulator gps cannot use with pixhawk at same time-->
+<!--    <node name = "sim_gps" pkg = "ball_detect" type = "sim_gps" respawn = "true" output = "screen" />-->
+
+    <include file="$(find ball_detect)/launch/yolo_detection.launch"/>
+
     <node name="client_tcp" pkg="sailing_robot" type="client_tcp"/>
     <!--node name = "debugging_2D_plot_matplot" pkg="sailing_robot" type="debugging_2D_plot_matplot" /-->
 
