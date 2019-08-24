@@ -59,7 +59,7 @@ class Navigation(object):
             self.relative_position_heading -= 360
         self.relative_position = self.boat_position.offset(self.relative_position_heading,
                                                            self.relative_position_distance / 1000.0)
-        self.detected = msg.isDetected and 0.5 < self.relative_position_distance < 10
+        self.detected = msg.isDetected and 0.5 < self.relative_position_distance < 7
         if len(self.detected_list) == 20:
             pop = self.detected_list.pop(0)
             if pop:
