@@ -70,8 +70,8 @@ class Navigation(object):
 
     def calculate_ball_position(self):
         self.ball_position = LatLon(
-            sum([pos.latitude for pos in self.relative_position_list]) / len(self.relative_position_list),
-            sum([pos.longitude for pos in self.relative_position_list]) / len(self.relative_position_list))
+            sum([pos.lat.decimal_degree for pos in self.relative_position_list]) / len(self.relative_position_list),
+            sum([pos.lon.decimal_degree for pos in self.relative_position_list]) / len(self.relative_position_list))
         return self.ball_position
 
     def update_position(self, msg):

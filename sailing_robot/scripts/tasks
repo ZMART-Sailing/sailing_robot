@@ -35,7 +35,8 @@ def goal_heading_publisher(tasks_runner):
         pub.publish(goal_heading)
         pub_state.publish(state)
         pub_direct.publish(nav.direct)
-        pub_detected.publish(nav.detected)
+        if nav.detected:
+            pub_detected.publish(nav.detected)
         pub_task_direct_rudder_control.publish(nav.task_direct_rudder_control)
         pub_task_direct_sailsheet_normalized.publish(nav.task_direct_sailsheet_normalized)
         rate.sleep()
