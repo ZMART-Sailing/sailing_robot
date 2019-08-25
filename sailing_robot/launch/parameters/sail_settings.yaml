@@ -11,8 +11,8 @@ sailsettings/table: {'0': 0,
 }
 
 # Servo PWM limits in microseconds
-sail/servolowerlimits: 1130
-sail/servohigherlimits: 1740
+sail/servolowerlimits: 1230
+sail/servohigherlimits: 1820
 sail/PWMoffset: 0
 
 sailsettings/windSpeed: 2
