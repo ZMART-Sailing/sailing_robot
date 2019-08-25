@@ -173,6 +173,20 @@ int main(int argc, char* argv[])
           boat_and_ball_msg.heading = heading;
           boat_and_ball_msg.distance = depth;
 
+          // if at least one tag is detected, save the image
+          time_t tt;
+          time(&tt);
+          tt += 8*3600;
+          tm* t = gmtime(&tt);
+          string str;
+          ostringstream convert;
+          convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+          str = convert.str();
+
+          cout << "imwrite to: " << "/home/zmart/yolo_detect/" + str + ".jpg" << endl;
+          cv::imwrite("/home/zmart/yolo_detect/" + str + ".jpg", color_image);
+
+
           boat_and_ball_msg.boat_pos = cur_nav;
         }
         else {
