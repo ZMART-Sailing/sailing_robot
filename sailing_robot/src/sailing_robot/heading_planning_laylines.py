@@ -14,7 +14,7 @@ class HeadingPlan(TaskBase):
     LAYLINE_EXTENT = 10000
 
     def __init__(self, nav, waypoint = ll.LatLon(50.742810, 1.014469),  # somewhere in the solent
-                 target_radius = 4, tack_voting_radius = 20, waypoint_id = '', name = '', *args, **kwargs):
+                 target_radius = 4, tack_voting_radius = 15, waypoint_id = '', name = '', *args, **kwargs):
         """Sail towards a waypoint.
 
         *nav* is a sailing_robot.navigation.Navigation instance.
