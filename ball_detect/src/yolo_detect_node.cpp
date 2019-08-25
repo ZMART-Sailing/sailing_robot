@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
   ros::Subscriber detect_sub = node_.subscribe("/darknet_ros/found_object", 1000, detectCallBack);
   ros::Subscriber boxes_sub = node_.subscribe("/darknet_ros/bounding_boxes", 1000, yoloCallBack);
   ros::Subscriber boat_pos_sub = node_.subscribe("/position", 1000, posCallBack);
-  ros::Subscriber detect_image_sub = node_.subscribe("/darknet_ros/detection_image", 2, detectImgCallBack);
+  //ros::Subscriber detect_image_sub = node_.subscribe("/darknet_ros/detection_image", 2, detectImgCallBack);
   //发布经过处理的检测信息
   ros::Publisher boat_and_ball_pub = node_.advertise<ball_detect::BoatAndBall>("boat_and_ball", 10);
 
