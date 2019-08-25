@@ -2,17 +2,17 @@
 # Some of these waypoints may not be suitable in all tide conditions!!
 # for simplified entry of path, simply add list of waypoint names
 # starts with list entry 0, continues until end is reached
-# wp/list: ["1", "2", "3"]
+wp/list: ["1", "2", "3"]
 # wp/list: ["1", "2","3","4"]
 # triangle: 4, 5, 6
 # position keeping: 4
 # position keeping: 4, 5
 # downwind: 6, 7
-wp/tasks: [
-{"kind": "to_waypoint", "waypoint": "1"},
-{"kind": "keep_station", "waypoint": "2"},
-{"kind": "keep_station_obstacle", "waypoint": "3"},
-]
+# wp/tasks: [
+# {"kind": "to_waypoint", "waypoint": "1"},
+# {"kind": "keep_station", "waypoint": "2"},
+# {"kind": "keep_station_obstacle", "waypoint": "3"},
+# ]
 
 # distance within waypoint is accepted, in [m]
 wp/target_radius: 3
