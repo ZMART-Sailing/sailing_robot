@@ -55,7 +55,7 @@ nav/absolute_wind_direction: 120
 # Helming Procedure
 #
 # True to turn by jibing preferably instead of tacking:
-procedure/jibe_to_turn: true
+procedure/jibe_to_turn: false
 
 # Timeout after wich a procedure is considered as failed
 procedure/timeout: 15 #in second

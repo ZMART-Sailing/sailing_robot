@@ -23,15 +23,12 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
                     [self.nav.ball_position.lat.decimal_degree, self.nav.ball_position.lon.decimal_degree]))
                 self.update_waypoint(self.nav.ball_position)
             dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
-            print dwp, hwp
             if dwp < self.target_radius:
                 self.taskdict['tasks'][0].update({
                     'waypoint': (self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree)
                 })
-                print self.taskdict
                 self.station_keeping = \
                     make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/station_keeping')[0]
-                print self.station_keeping
 
             return super(HeadingPlan, self).calculate_state_and_goal()
         else:

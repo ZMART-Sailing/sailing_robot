@@ -14,47 +14,48 @@ from sailing_robot.pid_data import PID_Data
 import sailing_robot.pid_control as _PID
 from sailing_robot.navigation import angle_subtract
 
-
 # Sheet control
-WIND      = object()
-SHEET_IN  = object()
+WIND = object()
+SHEET_IN = object()
 SHEET_OUT = object()
 
 # Rudder control
-PID_GOAL_HEADING  = object()
-PID_ANGLE_TO_WIND = object() # set an angle to the wind, 0 being going torward the wind, can be either 0/360 or -180/180
-RUDDER_FULL_LEFT  = object() # the boat is going to the left
-RUDDER_FULL_RIGHT = object() # the boat is going to the right
+PID_GOAL_HEADING = object()
+PID_ANGLE_TO_WIND = object()  # set an angle to the wind, 0 being going torward the wind, can be either 0/360 or -180/180
+RUDDER_FULL_LEFT = object()  # the boat is going to the left
+RUDDER_FULL_RIGHT = object()  # the boat is going to the right
 
 # Publishers for rudder and sailsheet control
-PUB_RUDDER    = rospy.Publisher('rudder_control', Int16, queue_size=10)  # Use UInt 16 here to minimize the memory use
-PUB_SAILSHEET = rospy.Publisher('sailsheet_normalized', Float32, queue_size=10)
+PUB_RUDDER = rospy.Publisher('rudder_control', Int16, queue_size = 10)  # Use UInt 16 here to minimize the memory use
+PUB_SAILSHEET = rospy.Publisher('sailsheet_normalized', Float32, queue_size = 10)
 
-PUB_dbg_helming = rospy.Publisher('dbg_helming_procedure', String, queue_size=10)
-
+PUB_dbg_helming = rospy.Publisher('dbg_helming_procedure', String, queue_size = 10)
 
 data = PID_Data()
 rudder = rospy.get_param('rudder')
-controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'],rudder['maxAngle'], -rudder['maxAngle'])
+controller = _PID.PID(rudder['control']['Kp'], rudder['control']['Ki'], rudder['control']['Kd'], rudder['maxAngle'],
+                      -rudder['maxAngle'])
 remote_control = False
 
-sail_table_dict   = rospy.get_param('sailsettings/table')
+sail_table_dict = rospy.get_param('sailsettings/table')
 sheet_out_to_jibe = rospy.get_param('sailsettings/sheet_out_to_jibe', False)
-sail_table        = SailTable(sail_table_dict)
-sail_data         = SailData(sail_table)
+sail_table = SailTable(sail_table_dict)
+sail_data = SailData(sail_table)
 
-TIMEOUT      = rospy.get_param('procedure/timeout')
+TIMEOUT = rospy.get_param('procedure/timeout')
 EXPLORE_COEF = rospy.get_param('procedure/exploration_coefficient')
+
 
 ##########################################################################
 def update_remote_control(msg):
     remote_control = msg.data
 
-def set_sail(sheet_control, offset=0.0):
+
+def set_sail(sheet_control, offset = 0.0):
     if sheet_control is WIND:
         sheet_normalized = sail_data.calculate_sheet_setting() + offset
 
-        
+
     elif sheet_control is IN:
         sheet_normalized = 0
 
@@ -67,16 +68,16 @@ def set_sail(sheet_control, offset=0.0):
     # be sure we don't publish values above 1 and below 0
     sheet_normalized = np.clip(sheet_normalized, 0, 1)
     PUB_SAILSHEET.publish(sheet_normalized)
-    
 
-def set_rudder(state, angle_to_wind=0):
+
+def set_rudder(state, angle_to_wind = 0):
     if state is PID_GOAL_HEADING:
         rawangle = -controller.update_PID(angle_subtract(data.heading, data.goal_heading))
-        angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+        angle = _PID.saturation(rawangle, -rudder['maxAngle'], rudder['maxAngle'])
 
     elif state is PID_ANGLE_TO_WIND:
-        rawangle = -controller.update_PID(angle_subtract(angle_to_wind, sail_data.wind_direction_apparent)) 
-        angle = _PID.saturation(rawangle,-rudder['maxAngle'], rudder['maxAngle'])
+        rawangle = -controller.update_PID(angle_subtract(angle_to_wind, sail_data.wind_direction_apparent))
+        angle = _PID.saturation(rawangle, -rudder['maxAngle'], rudder['maxAngle'])
 
     elif state is RUDDER_FULL_LEFT:
         angle = rudder['maxAngle']
@@ -86,12 +87,12 @@ def set_rudder(state, angle_to_wind=0):
 
     PUB_RUDDER.publish(int(angle))
 
+
 ##########################################################################
 
 
-
 class ProcedureBase(object):
-    def __init__(self, sailing_state, timeout=TIMEOUT):
+    def __init__(self, sailing_state, timeout = TIMEOUT):
         self.start_time = time.time()
         self.timeout = timeout
         self.sailing_state = sailing_state
@@ -101,12 +102,11 @@ class ProcedureBase(object):
         Am I out of time?
         Am I failing?
         """
-        currenttime = time.time()
         return self.EnlapsedTime() > self.timeout
 
     def EnlapsedTime(self):
         currenttime = time.time()
-        return currenttime - self.start_time 
+        return currenttime - self.start_time
 
     def __str__(self):
         return self.__class__.__name__
@@ -116,30 +116,31 @@ class TackBasic(ProcedureBase):
     """
     Basic Tack procedure
     """
-    def __init__(self, sailing_state, timeout=TIMEOUT):
-        super(TackBasic, self).__init__(sailing_state, timeout) 
+
+    def __init__(self, sailing_state, timeout = TIMEOUT):
+        super(TackBasic, self).__init__(sailing_state, timeout)
 
     def loop(self):
         set_sail(WIND)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder(RUDDER_FULL_RIGHT) 
+            set_rudder(RUDDER_FULL_RIGHT)
         else:
             set_rudder(RUDDER_FULL_LEFT)
-
 
 
 class JibeBasic(ProcedureBase):
     """
     Basic Jibe procedure
     """
-    def __init__(self, sailing_state, timeout=TIMEOUT):
-        super(JibeBasic, self).__init__(sailing_state, timeout) 
+
+    def __init__(self, sailing_state, timeout = TIMEOUT):
+        super(JibeBasic, self).__init__(sailing_state, timeout)
 
     def loop(self):
         # sheet out a bit more than what is given by the look up table
-        set_sail(WIND, offset=+0.2)
+        set_sail(WIND, offset = +0.2)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder(RUDDER_FULL_LEFT) 
+            set_rudder(RUDDER_FULL_LEFT)
         else:
             set_rudder(RUDDER_FULL_RIGHT)
 
@@ -152,25 +153,26 @@ class TackSheetOut(ProcedureBase):
     in some strong conditions. Hence sheeting out is needed, however if the sails are out
     too much the boat will not have enough power to tack 
     """
-    def __init__(self, sailing_state, timeout=TIMEOUT):
-        super(TackSheetOut, self).__init__(sailing_state, timeout) 
+
+    def __init__(self, sailing_state, timeout = TIMEOUT):
+        super(TackSheetOut, self).__init__(sailing_state, timeout)
 
     def loop(self):
         # sheet out a bit more than what is given by the look up table
-        set_sail(WIND, offset=+0.2)
+        set_sail(WIND, offset = +0.2)
         if self.sailing_state == "switch_to_port_tack":
-            set_rudder(RUDDER_FULL_RIGHT) 
+            set_rudder(RUDDER_FULL_RIGHT)
         else:
             set_rudder(RUDDER_FULL_LEFT)
-
 
 
 class Tack_IncreaseAngleToWind(ProcedureBase):
     """
     More advance Tack procedure, building speed for 5s by going less upwind
     """
-    def __init__(self, sailing_state, timeout=TIMEOUT):
-        super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout) 
+
+    def __init__(self, sailing_state, timeout = TIMEOUT):
+        super(Tack_IncreaseAngleToWind, self).__init__(sailing_state, timeout)
         self.beating_angle = 80
 
     def loop(self):
@@ -179,13 +181,12 @@ class Tack_IncreaseAngleToWind(ProcedureBase):
             if self.sailing_state == "switch_to_port_tack":
                 set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = self.beating_angle)
             else:
-                set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = 360-self.beating_angle)  
+                set_rudder(PID_ANGLE_TO_WIND, angle_to_wind = 360 - self.beating_angle)
         else:
             if self.sailing_state == "switch_to_port_tack":
-                set_rudder(RUDDER_FULL_RIGHT) 
+                set_rudder(RUDDER_FULL_RIGHT)
             else:
                 set_rudder(RUDDER_FULL_LEFT)
-
 
 
 ##########################################################################
@@ -196,12 +197,13 @@ class ProcedureHandle():
         after each tack attempt weight based on time taken by the procedure
         are given to each procedure for the future.
     """
+
     def __init__(self, ProcedureList):
 
         # Initialisation of the procedure list with initial weights, integers with increment of 1
-        self.ProcedureList = [ {"Procedure": Procedure, 
-                                "TimeList": collections.deque(maxlen = 10),
-                                "InitPos": i} for i,Procedure in enumerate(ProcedureList) ]
+        self.ProcedureList = [{
+                                  "Procedure": Procedure, "TimeList": collections.deque(maxlen = 10), "InitPos": i
+                              } for i, Procedure in enumerate(ProcedureList)]
 
         self.currentProcedureId = 0
         self.currentProcedure = None
@@ -221,16 +223,15 @@ class ProcedureHandle():
             if x['TimeList']:
                 return np.mean(x['TimeList'])
             else:
-                if random.random() < (EXPLORE_COEF / sum([ not x['TimeList'] for x in self.ProcedureList])):
+                if random.random() < (EXPLORE_COEF / sum([not x['TimeList'] for x in self.ProcedureList])):
                     rospy.logwarn("Random procedure picked")
                     # Add some randomness in choice for untested procedures
-                    return 0.1*random.random()
+                    return 0.1 * random.random()
                 else:
                     # Just to keep the order given at first if the procedure was not tested yet
-                    return TIMEOUT + x['InitPos']*0.01*TIMEOUT
+                    return TIMEOUT + x['InitPos'] * 0.01 * TIMEOUT
 
-        self.ProcedureList = sorted(self.ProcedureList, key=get_weight)
-        # rospy.logwarn(str(self.ProcedureList))
+        self.ProcedureList = sorted(self.ProcedureList, key = get_weight)  # rospy.logwarn(str(self.ProcedureList))
 
     def MarkSuccess(self):
         if not remote_control:
@@ -242,7 +243,7 @@ class ProcedureHandle():
         if not remote_control:
             PUB_dbg_helming.publish("fail " + str(self.currentProcedure))
             # In case of failure the weight given is 1.5 times the timeout
-            self.ProcedureList[self.currentProcedureId]['TimeList'].append(1.5*TIMEOUT)
+            self.ProcedureList[self.currentProcedureId]['TimeList'].append(1.5 * TIMEOUT)
         self.currentProcedure = None
 
     def StartProcedure(self, sailing_state):
@@ -253,10 +254,9 @@ class ProcedureHandle():
 ##########################################################################
 
 
-
 class Helming():
     def __init__(self):
-        rospy.init_node('helming', anonymous=True)
+        rospy.init_node('helming', anonymous = True)
         self.rate = rospy.Rate(rospy.get_param("config/rate"))
 
         # Initialisation of the procedure list
@@ -264,7 +264,6 @@ class Helming():
             procedureList = [JibeBasic, TackBasic, TackSheetOut, Tack_IncreaseAngleToWind]
         else:
             procedureList = [TackBasic, TackSheetOut, Tack_IncreaseAngleToWind, JibeBasic]
-
 
         self.Proc = ProcedureHandle(procedureList)
         self.Runner()
@@ -274,8 +273,8 @@ class Helming():
             if data.sailing_state == 'normal':
                 if self.Proc.ProcedureInProgress():
                     # ending a procedure because it is finished according to the highlevel
-                    rospy.logwarn("Procedure success "+ str(self.Proc.currentProcedure)+
-                                  " in "+ '{:.2f}'.format(self.Proc.currentProcedure.EnlapsedTime()) + "s")
+                    rospy.logwarn("Procedure success " + str(self.Proc.currentProcedure) + " in " + '{:.2f}'.format(
+                        self.Proc.currentProcedure.EnlapsedTime()) + "s")
                     self.Proc.MarkSuccess()
 
                 set_rudder(PID_GOAL_HEADING)
@@ -285,7 +284,6 @@ class Helming():
                 self.runProcedure()
 
             self.rate.sleep()
-
 
     def runProcedure(self):
         if (not self.Proc.ProcedureInProgress()) or (data.sailing_state != self.Proc.currentProcedure.sailing_state):
@@ -307,8 +305,6 @@ class Helming():
         self.Proc.currentProcedure.loop()
 
 
-
-
 if __name__ == '__main__':
     try:
         rospy.Subscriber('wind_direction_apparent', Float64, sail_data.update_wind)
@@ -322,6 +318,3 @@ if __name__ == '__main__':
         pass
 
 ########################################################################
-
-
-

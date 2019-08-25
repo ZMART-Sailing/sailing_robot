@@ -86,11 +86,11 @@ class HeadingPlan(TaskBase):
         wp_wind_angle = self.nav.heading_to_wind_angle(hwp)
 
         # Detect if the waypoint is downwind, if so head directly to it
-        if self.nav.beating_angle < wp_wind_angle % 360 < 360 - self.nav.beating_angle:
+        if abs(wp_wind_angle) > 90:
             goal_wind_angle = wp_wind_angle
             self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
             state = 'normal'
-            return state, self.nav.wind_angle_to_heading(goal_wind_angle)
+            return state, hwp
 
         tack_now = False
         if wp_wind_angle * boat_wind_angle > 0:
