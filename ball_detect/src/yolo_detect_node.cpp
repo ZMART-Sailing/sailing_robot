@@ -78,6 +78,7 @@ bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, 
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg);
 void detectCallBack(const std_msgs::Int8::ConstPtr& msg);
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg);
+void detectImgCallBack(const sensor_msgs::Image::ConstPtr& msg);
 float depthCubicCalibration(const float depth);
 float getScore(deque<int>* dtc_list);
 float* getAveragePos(deque<int>* dtc_list, deque<float*>* pos_list);
@@ -94,7 +95,7 @@ int main(int argc, char* argv[])
   ros::Subscriber detect_sub = node_.subscribe("/darknet_ros/found_object", 1000, detectCallBack);
   ros::Subscriber boxes_sub = node_.subscribe("/darknet_ros/bounding_boxes", 1000, yoloCallBack);
   ros::Subscriber boat_pos_sub = node_.subscribe("/position", 1000, posCallBack);
-
+  ros::Subscriber detect_image_sub = node_.subscribe("/darknet_ros/detection_image", 2, detectImgCallBack);
   //发布经过处理的检测信息
   ros::Publisher boat_and_ball_pub = node_.advertise<ball_detect::BoatAndBall>("boat_and_ball", 10);
 
@@ -172,21 +173,6 @@ int main(int argc, char* argv[])
           boat_and_ball_msg.isDetected = true;
           boat_and_ball_msg.heading = heading;
           boat_and_ball_msg.distance = depth;
-
-          // if at least one tag is detected, save the image
-          time_t tt;
-          time(&tt);
-          tt += 8*3600;
-          tm* t = gmtime(&tt);
-          string str;
-          ostringstream convert;
-          convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
-          str = convert.str();
-
-          cout << "imwrite to: " << "/home/zmart/yolo_detect/" + str + ".jpg" << endl;
-          cv::imwrite("/home/zmart/yolo_detect/" + str + ".jpg", color_image);
-
-
           boat_and_ball_msg.boat_pos = cur_nav;
         }
         else {
@@ -258,6 +244,21 @@ void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
     nav_sub.latitude = msg->latitude;
     nav_sub.longitude = msg->longitude;
     nav_sub.position_covariance = msg->position_covariance;
+}
+
+void detectImgCallBack(const sensor_msgs::Image::ConstPtr& msg) {
+  time_t tt;
+  time(&tt);
+  tt += 8*3600;
+  tm* t = gmtime(&tt);
+  string str;
+  ostringstream convert;
+  convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+  str = convert.str();
+  cout << "imwrite to: " << "/home/zmart/yolo_detection/" + str + ".jpg" << endl;
+  cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+  Mat img = cv_ptr->image;
+  cv::imwrite("/home/zmart/yolo_detection/" + str + ".jpg", img);
 }
 
 float getScore(deque<int>* dtc_list) {
