@@ -49,7 +49,7 @@ navigation/beating_angle: 45
 # zone you are.
 navigation/utm_zone: 51
 # define absolute_wind_direction
-nav/absolute_wind_direction: 120
+nav/absolute_wind_direction: 180
 
 #
 # Helming Procedure
