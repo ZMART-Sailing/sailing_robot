@@ -60,10 +60,10 @@ class Nano_Client():
                 self.position.longitude = jsensor_data['longitude'] + 0.0
                 self.velocity.data = jsensor_data['velocity']
                 # real wind_direction
-                self.wind_direction_apparent.data = jsensor_data['wind_direction_apparent']
+                # self.wind_direction_apparent.data = jsensor_data['wind_direction_apparent']
 
                 # defined wind_direction in default.yaml
-                # self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
+                self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
 
                 if self.wind_direction_apparent.data < 0:
                     self.wind_direction_apparent.data += 360.0
