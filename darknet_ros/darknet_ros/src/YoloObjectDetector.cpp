@@ -65,7 +65,6 @@ bool YoloObjectDetector::readParameters()
     ROS_INFO("[YoloObjectDetector] Xserver is running.");
   } else {
     ROS_INFO("[YoloObjectDetector] Xserver is not running.");
-    viewImage_ = false;
   }
 
   // Set vector sizes.
@@ -263,8 +262,8 @@ bool YoloObjectDetector::isCheckingForObjects() const
 
 bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
 {
-  if (detectionImagePublisher_.getNumSubscribers() < 1)
-    return false;
+  //if (detectionImagePublisher_.getNumSubscribers() < 1)
+  //  return false;
   cv_bridge::CvImage cvImage;
   cvImage.header.stamp = imageHeader_.stamp;
   cvImage.header.frame_id = "detection_image";
@@ -525,7 +524,7 @@ void YoloObjectDetector::yolo()
 
   int count = 0;
 
-  if (!demoPrefix_ && viewImage_) {
+  if (!demoPrefix_ && false) {
     cvNamedWindow("YOLO V3", CV_WINDOW_NORMAL);
     if (fullScreen_) {
       cvSetWindowProperty("YOLO V3", CV_WND_PROP_FULLSCREEN, CV_WINDOW_FULLSCREEN);
@@ -544,9 +543,7 @@ void YoloObjectDetector::yolo()
     if (!demoPrefix_) {
       fps_ = 1./(what_time_is_it_now() - demoTime_);
       demoTime_ = what_time_is_it_now();
-      if (viewImage_) {
-        displayInThread(0);
-      }
+      displayInThread(0);
       publishInThread();
     } else {
       char name[256];
@@ -560,7 +557,6 @@ void YoloObjectDetector::yolo()
       demoDone_ = true;
     }
   }
-
 }
 
 IplImageWithHeader_ YoloObjectDetector::getIplImageWithHeader()
@@ -589,7 +585,6 @@ void *YoloObjectDetector::publishInThread()
   if (!publishDetectionImage(cv::Mat(cvImage))) {
     ROS_DEBUG("Detection image has not been broadcasted.");
   }
-
   // Publish bounding boxes and detection result.
   int num = roiBoxes_[0].num;
   if (num > 0 && num <= 100) {
