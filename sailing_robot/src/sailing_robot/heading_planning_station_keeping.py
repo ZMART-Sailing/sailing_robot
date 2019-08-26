@@ -6,7 +6,8 @@ import make_ros_tasks
 class HeadingPlan(heading_planning_laylines.HeadingPlan):
     def __init__(self, *args, **kwargs):
         super(HeadingPlan, self).__init__(*args, **kwargs)
-        self.debug_topics.extend([('dbg_ball_position', 'String'), ('dbg_keeping', 'Bool'), ])
+        self.debug_topics.extend(
+            [('dbg_ball_position', 'String'), ('dbg_relative_position_list_len', 'Int16'), ('dbg_keeping', 'Bool'), ])
         self.station_keeping = None
         self.taskdict = {
             'target_radius': self.target_radius,
@@ -17,6 +18,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
     def calculate_state_and_goal(self):
         self.debug_pub('dbg_keeping', self.station_keeping is not None)
         if self.station_keeping is None:
+            self.debug_pub('dbg_relative_position_list_len', len(self.nav.relative_position_list))
             if len(self.nav.relative_position_list) > 0:
                 self.nav.calculate_ball_position()
                 self.debug_pub('dbg_ball_position', json.dumps(
