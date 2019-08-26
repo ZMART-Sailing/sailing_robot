@@ -2,7 +2,14 @@ import LatLon
 import json
 
 waypoints = [LatLon.LatLon(*waypoint) for waypoint in
-             [50.8896095, -1.383619], [50.8896095, -1.383701666667], [50.889478, -1.383536]]
+             [29.867475, 121.539166], [29.867390, 121.538790], [29.867544, 121.538868], [29.867631, 121.538592],]
+
+for i in range(len(waypoints) - 1):
+    print waypoints[i].distance(waypoints[i + 1]) * 1000
+    print waypoints[i].heading_initial(waypoints[i + 1])
+    print '------------'
+print waypoints[-2].distance(waypoints[-1])
+print waypoints[-2].heading_initial(waypoints[-1])
 
 print waypoints
 print type(waypoints[0])

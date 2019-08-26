@@ -1,10 +1,9 @@
-
 # Wind conditions:
 # wind speed in m/s (1m/s = 1.9kts)
 simulation/wind/speed: 5
 
 # wind direction relative to north
-simulation/wind/direction: 120
+simulation/wind/direction: 180
 
 # A gaussian noise is generated on both wind speed and wind direction, use a value of 0 to remove the noise generation.
 # These parameters are the 'width' of the gaussian distribution
@@ -22,7 +21,7 @@ simulation/velocity/minimum: 0.5
 
 # Time after a tack the boat velocity is reduced [s]
 simulation/velocity/tacking_punishment_time: 3 # [s]
-        
+
 # the velocity will be multiplied by the following coefficient after each tack
 simulation/velocity/tacking_punishment_coefficient: 0.2
 
