@@ -312,7 +312,7 @@ void pixel2Point(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, fl
 
 float depthCubicCalibration(const float depth)
 {
-  return 0.1436 * pow(depth, 2) + 0.884 * depth + 0.0501;
+  return 0.1951427938 * pow(depth, 2) + 0.7925300461 * depth;
 }
 
 bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float upixel[2], float& heading, float& depth)
