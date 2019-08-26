@@ -9,8 +9,8 @@
 # position keeping: 4, 5
 # downwind: 6, 7
 wp/tasks: [
-{"kind": "keep_station", "waypoint": "1"},
-{"kind": "keep_station_obstacle", "waypoint": "5"},
+{"kind": "to_waypoint_obstacle", "waypoint": "1"},
+{"kind": "to_waypoint", "waypoint": "2"},
 ]
 
 # distance within waypoint is accepted, in [m]
@@ -20,8 +20,8 @@ wp/tack_voting_radius: 5
 
 # Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
 #
-wp/table: {"1": [29.867475, 121.539166],
-           "2": [29.867390, 121.538790],
+wp/table: {"1": [29.867058614, 121.538749969],
+           "2": [29.866991992, 121.538759017],
            "3": [29.867544, 121.538868],
            "4": [29.867631, 121.538592],
            "5": [29.867402398, 121.538992513],
