@@ -43,5 +43,5 @@
     <include file="$(find ball_detect)/launch/yolo_detection.launch"/>
 
     <node name="client_tcp" pkg="sailing_robot" type="client_tcp"/>
-    <node name="rosbag_record" pkg="rosbag" type="record" respawn="true" args="-a -o /home/zmart/sailing_robot"/>
+<!--    <node name="rosbag_record" pkg="rosbag" type="record" respawn="true" args="-a -o /home/zmart/sailing_robot"/>-->
 </launch>
