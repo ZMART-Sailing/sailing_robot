@@ -15,6 +15,7 @@
 #include <ball_detect/BoundingBoxes.h>
 #include <sensor_msgs/NavSatFix.h>
 #include <ball_detect/BoatAndBall.h>
+#include <darknet_ros_msgs/FoundObject.h>
 
 // rs and opencv related
 #include <opencv2/opencv.hpp>
@@ -38,7 +39,6 @@
 using namespace std;
 using namespace cv;
 using namespace message_filters;
-
 
 #define PI M_PI
 #define EPSILON 1e-9
@@ -68,6 +68,8 @@ namespace  {
   rs2::frame color_frame;
   sensor_msgs::NavSatFix nav_sub = sensor_msgs::NavSatFix();
   sensor_msgs::NavSatFix cur_nav = sensor_msgs::NavSatFix();
+
+  string str;
 }
 
 string intToString(int number);
@@ -76,9 +78,9 @@ string floatToString(float number);
 void pixel2Point(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float u[2], float* upoint, float& depth);
 bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float u[2], float& heading, float& depth);
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg);
-void detectCallBack(const std_msgs::Int8::ConstPtr& msg);
+void detectCallBack(const darknet_ros_msgs::FoundObject::ConstPtr& msg);
 void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg);
-void detectImgCallBack(const sensor_msgs::Image::ConstPtr& msg);
+void callback(const darknet_ros_msgs::FoundObject::ConstPtr& detect_msg, const sensor_msgs::Image::ConstPtr& image_msg); //回调中包含多个消息
 float depthCubicCalibration(const float depth);
 float getScore(deque<int>* dtc_list);
 float* getAveragePos(deque<int>* dtc_list, deque<float*>* pos_list);
@@ -92,10 +94,14 @@ int main(int argc, char* argv[])
   //发布彩色图给yolo处理
   image_transport::Publisher color_image_pub = it.advertise("image_raw", 10);
   //从yolo订阅检测信息
-  ros::Subscriber detect_sub = node_.subscribe("/darknet_ros/found_object", 1000, detectCallBack);
+  // ros::Subscriber detect_sub = node_.subscribe("/darknet_ros/found_object", 1000, detectCallBack);
   ros::Subscriber boxes_sub = node_.subscribe("/darknet_ros/bounding_boxes", 1000, yoloCallBack);
   ros::Subscriber boat_pos_sub = node_.subscribe("/position", 1000, posCallBack);
-  //ros::Subscriber detect_image_sub = node_.subscribe("/darknet_ros/detection_image", 2, detectImgCallBack);
+  message_filters::Subscriber<sensor_msgs::Image> image_sub(node_, "/darknet_ros/detection_image", 1);           
+  message_filters::Subscriber<darknet_ros_msgs::FoundObject> detect_sub(node_, "/darknet_ros/found_object", 1);
+  TimeSynchronizer<darknet_ros_msgs::FoundObject, sensor_msgs::Image> sync(detect_sub, image_sub, 1);
+  sync.registerCallback(boost::bind(&callback, _1, _2));
+                     // 回调
   //发布经过处理的检测信息
   ros::Publisher boat_and_ball_pub = node_.advertise<ball_detect::BoatAndBall>("boat_and_ball", 10);
 
@@ -204,15 +210,38 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-void detectCallBack(const std_msgs::Int8::ConstPtr& msg) {
+void callback(const darknet_ros_msgs::FoundObject::ConstPtr& detect_msg, const sensor_msgs::Image::ConstPtr& image_msg) {
   depth_lock = false;
-  if (msg->data == true) {
+  if (detect_msg->type == true) {
     isDetected = true;
+    time_t tt;
+    time(&tt);
+    tt += 8*3600;
+    tm* t = gmtime(&tt);
+    ostringstream convert;
+    convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+    if (str != convert.str()) {
+      str = convert.str();
+      cout << "imwrite to: " << "/home/zmart/yolo_detection/" + str + ".jpg" << endl;
+      Mat img = cv_bridge::toCvShare(image_msg, "bgr8")->image;
+      cv::imwrite("/home/zmart/yolo_detection/" + str + ".jpg", img);       
+    }
+   
   }
   else {
     isDetected = false;
   }
 }
+
+// void detectCallBack(const darknet_ros_msgs::FoundObject::ConstPtr& msg) {
+//   depth_lock = false;
+//   if (msg->type == true) {
+//     isDetected = true;
+//   }
+//   else {
+//     isDetected = false;
+//   }
+// }
 
 void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
   int area = 0, x, y;
@@ -246,20 +275,6 @@ void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
     nav_sub.position_covariance = msg->position_covariance;
 }
 
-void detectImgCallBack(const sensor_msgs::Image::ConstPtr& msg) {
-  time_t tt;
-  time(&tt);
-  tt += 8*3600;
-  tm* t = gmtime(&tt);
-  string str;
-  ostringstream convert;
-  convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
-  str = convert.str();
-  cout << "imwrite to: " << "/home/zmart/yolo_detection/" + str + ".jpg" << endl;
-  cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
-  Mat img = cv_ptr->image;
-  cv::imwrite("/home/zmart/yolo_detection/" + str + ".jpg", img);
-}
 
 float getScore(deque<int>* dtc_list) {
   return 1.0 * accumulate(dtc_list->begin(), dtc_list->end(), 0) / dtc_list->size();
