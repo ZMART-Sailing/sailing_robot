@@ -157,9 +157,14 @@ void YoloObjectDetector::init()
 
   imageSubscriber_ = imageTransport_.subscribe(cameraTopicName, cameraQueueSize,
                                                &YoloObjectDetector::cameraCallback, this);
-  objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName,
+  // objectPublisher_ = nodeHandle_.advertise<std_msgs::Int8>(objectDetectorTopicName,
+  //                                                          objectDetectorQueueSize,
+  //                                                          objectDetectorLatch);
+
+  objectPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::FoundObject>(objectDetectorTopicName,
                                                            objectDetectorQueueSize,
                                                            objectDetectorLatch);
+
   boundingBoxesPublisher_ = nodeHandle_.advertise<darknet_ros_msgs::BoundingBoxes>(
       boundingBoxesTopicName, boundingBoxesQueueSize, boundingBoxesLatch);
   detectionImagePublisher_ = nodeHandle_.advertise<sensor_msgs::Image>(detectionImageTopicName,
@@ -261,7 +266,7 @@ bool YoloObjectDetector::publishDetectionImage(const cv::Mat& detectionImage)
   if (detectionImagePublisher_.getNumSubscribers() < 1)
     return false;
   cv_bridge::CvImage cvImage;
-  cvImage.header.stamp = ros::Time::now();
+  cvImage.header.stamp = imageHeader_.stamp;
   cvImage.header.frame_id = "detection_image";
   cvImage.encoding = sensor_msgs::image_encodings::BGR8;
   cvImage.image = detectionImage;
@@ -597,8 +602,10 @@ void *YoloObjectDetector::publishInThread()
       }
     }
 
-    std_msgs::Int8 msg;
-    msg.data = num;
+    darknet_ros_msgs::FoundObject msg;
+    msg.header.stamp = imageHeader_.stamp;
+    msg.header.frame_id = "found_object";
+    msg.type = num;
     objectPublisher_.publish(msg);
 
     for (int i = 0; i < numClasses_; i++) {
@@ -626,8 +633,10 @@ void *YoloObjectDetector::publishInThread()
     boundingBoxesResults_.image_header = headerBuff_[(buffIndex_ + 1) % 3];
     boundingBoxesPublisher_.publish(boundingBoxesResults_);
   } else {
-    std_msgs::Int8 msg;
-    msg.data = 0;
+    darknet_ros_msgs::FoundObject msg;
+    msg.header.stamp = imageHeader_.stamp;
+    msg.header.frame_id = "found_object";
+    msg.type = num;
     objectPublisher_.publish(msg);
   }
   if (isCheckingForObjects()) {

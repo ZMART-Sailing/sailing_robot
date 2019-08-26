@@ -36,6 +36,7 @@
 // darknet_ros_msgs
 #include <darknet_ros_msgs/BoundingBoxes.h>
 #include <darknet_ros_msgs/BoundingBox.h>
+#include <darknet_ros_msgs/FoundObject.h>
 #include <darknet_ros_msgs/CheckForObjectsAction.h>
 
 // Darknet.
