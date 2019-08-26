@@ -56,6 +56,11 @@ def expand_task_dict(wp_params):
                 expanded_task.update({
                     'close_factor': wp_task.get('close_factor', 0.8)
                 })
+            elif kind == 'to_waypoint_offset':
+                expanded_task.update({
+                    'offset_distance': wp_task.get('offset_distance', 0.0),
+                    'offset_heading': wp_task.get('offset_heading', 0.0),
+                })
             elif kind == 'keep_station':
                 expanded_task.update({
                     'linger': wp_task.get('linger', 300),
