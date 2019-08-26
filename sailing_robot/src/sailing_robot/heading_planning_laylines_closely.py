@@ -25,7 +25,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
 
     def calculate_state_and_goal(self):
         self.update_waypoint(self.calculate_real_waypoint())
-        self.update_target_radius(self.calculate_target_radius())
+        # self.update_target_radius(self.calculate_target_radius())
         self.debug_pub('dbg_real_waypoint',
                        json.dumps([self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree]))
         return super(HeadingPlan, self).calculate_state_and_goal()
