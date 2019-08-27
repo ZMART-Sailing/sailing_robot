@@ -55,6 +55,9 @@ namespace  {
   const float DEPTH_MIN = 0.2;
   const float DEPTH_MAX = 10;
 
+  const int area_threshold = 1000;
+  const int ratio_threshold = 3;
+
   bool depth_lock = false;
   bool first_flag = true;
   uint16_t* data = NULL;
@@ -246,8 +249,15 @@ void yoloCallBack(const ball_detect::BoundingBoxes::ConstPtr& msg) {
   int area = 0, x, y;
   double prob = 0;
   for(size_t i = 0; i < msg->bounding_boxes.size(); i++) {
+  	bool area_con = false;
     int area_tmp = abs(msg->bounding_boxes[i].xmax - msg->bounding_boxes[i].xmin) * abs(msg->bounding_boxes[i].ymax - msg->bounding_boxes[i].ymin);
-    if (msg->bounding_boxes[i].probability > prob) {
+    area_con = (area_tmp > area_threshold);
+
+    bool ratio_con = false;
+    float wh_ratio = 1.0 * abs(msg->bounding_boxes[i].xmax - msg->bounding_boxes[i].xmin) /  abs(msg->bounding_boxes[i].ymax - msg->bounding_boxes[i].ymin);
+    ratio_con = (wh_ratio > 1.0 / ratio_threshold) && (wh_ratio < ratio_threshold);
+
+    if (area_con && ratio_con && msg->bounding_boxes[i].probability > prob) {
       area = area_tmp;
       x = (msg->bounding_boxes[i].xmax + msg->bounding_boxes[i].xmin) / 2;
       y = (msg->bounding_boxes[i].ymax + msg->bounding_boxes[i].ymin) / 2;
@@ -316,9 +326,11 @@ float depthCubicCalibration(const float depth)
 
 bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, float upixel[2], float& heading, float& depth)
 {
+ 
  float upoint[3];
  pixel2Point(frame, intrin, upixel, upoint, depth);
  upoint[2] = depthCubicCalibration(upoint[2]);
+ float u1[3], dp1, u2[3], dp2, u3[3], dp3, u4[3], dp4;
  if (abs(upoint[2]) < EPSILON) {
    return false;
  }
