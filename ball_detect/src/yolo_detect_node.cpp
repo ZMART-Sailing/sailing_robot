@@ -224,7 +224,7 @@ void callback(const darknet_ros_msgs::FoundObject::ConstPtr& detect_msg, const s
       str = convert.str();
       cout << "imwrite to: " << "/home/zmart/yolo_detection/" + str + ".jpg" << endl;
       Mat img = cv_bridge::toCvShare(image_msg, "bgr8")->image;
-      //cv::imwrite("/home/zmart/yolo_detection/" + str + ".jpg", img);       
+      cv::imwrite("/home/zmart/yolo_detection/" + str + ".jpg", img);
     }
   }
   else {
