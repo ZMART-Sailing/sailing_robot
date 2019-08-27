@@ -381,7 +381,6 @@ AprilTagDetectionArray TagDetector::detectTags (
                                                  detection_names[i]));
     }
   }
-
   // if at least one tag is detected, save the image
   if (!tag_detection_array.detections.empty()) {
     time_t tt;
@@ -392,7 +391,6 @@ AprilTagDetectionArray TagDetector::detectTags (
     ostringstream convert;
     convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
     str = convert.str();
-
     cout << "imwrite to: " << "/home/zmart/tag_detect/" + str + ".jpg" << endl;
     cv::imwrite("/home/zmart/tag_detect/" + str + ".jpg", image->image);
   }
