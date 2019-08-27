@@ -33,7 +33,7 @@ class StationKeeping(taskbase.TaskBase):
         self.wind_angle = wind_angle
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
-        self.start_time = 0
+        self.start_time = None
         self.head_to_waypoint = heading_planning_laylines_closely.HeadingPlan(nav, self.waypoint, close_factor = 0.8,
                                                                               target_radius = radius,
                                                                               tack_voting_radius = radius)
