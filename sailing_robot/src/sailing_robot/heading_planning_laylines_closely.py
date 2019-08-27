@@ -9,6 +9,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
                  target_radius = 2, close_factor = 0.8, *args, **kwargs):
         self.target = waypoint
         self.target_radius = target_radius
+        self.accept_radius = target_radius
         self.close_factor = close_factor
         self.nav = nav
         super(HeadingPlan, self).__init__(nav, self.calculate_real_waypoint(), target_radius, *args, **kwargs)
@@ -22,6 +23,9 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
     def calculate_target_radius(self):
         return self.target_radius * (1 - self.close_factor) + min(self.target_radius * self.close_factor,
                                                                   self.nav.position_ll.distance(self.target) * 1000)
+
+    def reset_target_radius(self):
+        self.target_radius = self.accept_radius
 
     def calculate_state_and_goal(self):
         self.update_waypoint(self.calculate_real_waypoint())
