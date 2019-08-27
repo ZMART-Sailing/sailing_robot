@@ -12,7 +12,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
         self.taskdict = {
             'target_radius': self.target_radius,
             'tack_voting_radius': self.tack_voting_radius,
-            'tasks': [{'kind': 'keep_station_fix_wind_angle'}, ]
+            'tasks': [{'kind': 'keep_station_three_point'}, ]
         }
 
     def calculate_state_and_goal(self):
@@ -24,6 +24,8 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
                 self.debug_pub('dbg_ball_position', json.dumps(
                     [self.nav.ball_position.lat.decimal_degree, self.nav.ball_position.lon.decimal_degree]))
                 self.update_waypoint(self.nav.ball_position)
+                if self.station_keeping is not None:
+                    self.station_keeping.update_waypoint(self.nav.ball_position)
         if self.station_keeping is None:
             dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
             if dwp < self.target_radius:
@@ -35,7 +37,6 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
 
             return super(HeadingPlan, self).calculate_state_and_goal()
         else:
-            self.station_keeping.update_waypoint(self.nav.ball_position)
             return self.station_keeping.calculate_state_and_goal()
 
     def check_end_condition(self):
