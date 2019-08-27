@@ -55,8 +55,8 @@ class StationKeeping(taskbase.TaskRunnerBasedTaskBase):
 
     def calculate_waypoint_ll(self):
         self.last_wind_direction = self.nav.absolute_wind_direction()
-        return [self.waypoint.offset(-self.last_wind_direction + 90, self.radius),
-                self.waypoint.offset(-self.last_wind_direction - 90, self.radius)]
+        return [self.waypoint.offset(self.last_wind_direction + 90, self.radius),
+                self.waypoint.offset(self.last_wind_direction - 90, self.radius)]
 
     def calculate_waypoint(self, waypoints_ll = None):
         waypoints, waypoints_ll = super(StationKeeping, self).calculate_waypoint(waypoints_ll)
