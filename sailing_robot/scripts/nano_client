@@ -68,7 +68,7 @@ class Nano_Client():
                 self.velocity.data = jsensor_data['velocity']
                 if len(self.wind_direction_apparent_list) >= self.wind_direction_apparent_len:
                     self.wind_direction_apparent_list.pop()
-                self.wind_direction_apparent_list.insert(0, jsensor_data['wind_direction_apparent'])
+                self.wind_direction_apparent_list.insert(0, jsensor_data['wind_direction_apparent'] + self.heading.data)
                 # real wind_direction
                 self.wind_direction_apparent.data = self.calculate_wind_direction_apparent()
 
@@ -89,10 +89,15 @@ class Nano_Client():
         sock.close()
 
     def calculate_wind_direction_apparent(self):
-        return sum(
+        wind_direction_apparent = sum(
             [wind_direction_apparent * self.wind_direction_apparent_weight_list[i] for i, wind_direction_apparent in
              enumerate(self.wind_direction_apparent_list)]) / sum(
-            self.wind_direction_apparent_weight_list[:len(self.wind_direction_apparent_list)])
+            self.wind_direction_apparent_weight_list[:len(self.wind_direction_apparent_list)]) - self.heading.data
+        if wind_direction_apparent < 0:
+            wind_direction_apparent += 360
+        elif wind_direction_apparent > 360:
+            wind_direction_apparent -= 360
+        return wind_direction_apparent
 
     def rudderservoPWMcontrol(self, rudder_pwm_msg):
         self.pwm_data['rudder_pwm'] = rudder_pwm_msg.data

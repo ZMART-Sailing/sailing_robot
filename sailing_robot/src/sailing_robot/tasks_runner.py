@@ -113,7 +113,6 @@ class TasksRunner(object):
         self.process_jump()
 
         if self.active_task.check_end_condition():
-            self.active_task.reset()
             self.start_next_task()
 
         if self.nav.check_safety_zone() and self.active_task.task_kind != 'return_to_safety_zone':

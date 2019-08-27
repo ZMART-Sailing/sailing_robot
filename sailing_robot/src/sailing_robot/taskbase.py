@@ -29,9 +29,6 @@ class TaskBase(object):
     def init_ros(self):
         pass
 
-    def reset(self):
-        pass
-
 
 class ComplexTaskBase(TaskBase):
     def __init__(self, *args, **kwargs):

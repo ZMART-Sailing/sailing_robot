@@ -24,9 +24,6 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
         return self.accept_radius * (1 - self.close_factor) + min(self.accept_radius * self.close_factor,
                                                                   self.nav.position_ll.distance(self.target) * 1000)
 
-    def reset(self):
-        self.target_radius = self.accept_radius
-
     def calculate_state_and_goal(self):
         self.update_waypoint(self.calculate_real_waypoint())
         self.update_target_radius(self.calculate_target_radius())
