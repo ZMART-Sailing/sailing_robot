@@ -12,7 +12,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
         self.taskdict = {
             'target_radius': self.target_radius,
             'tack_voting_radius': self.tack_voting_radius,
-            'tasks': [{'kind': 'keep_station_obstacle'}, ]
+            'tasks': [{'kind': 'keep_station_fix_wind_angle'}, ]
         }
 
     def calculate_state_and_goal(self):
