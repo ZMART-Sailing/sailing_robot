@@ -36,8 +36,14 @@ class StationKeeping(taskbase.TaskBase):
         self.head_to_waypoint = heading_planning_laylines.HeadingPlan(nav, self.waypoint, target_radius = radius,
                                                                       tack_voting_radius = radius)
 
-    debug_topics = [('dbg_heading_to_waypoint', 'Float32'), ('dbg_distance_to_waypoint', 'Float32'),
-                    ('dbg_goal_wind_angle', 'Float32'), ]
+        self.debug_topics = [('dbg_heading_to_waypoint', 'Float32'), ('dbg_distance_to_waypoint', 'Float32'),
+                             ('dbg_goal_wind_angle', 'Float32'), ]
+
+    def update_waypoint(self, waypoint, waypoint_id = None):
+        self.waypoint = waypoint
+        self.waypoint_id = waypoint_id
+        self.waypoint_xy = Point(
+            self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
 
     def init_ros(self):
         # Allow our sub-task to publish debugging stuff

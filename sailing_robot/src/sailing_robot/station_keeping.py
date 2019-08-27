@@ -46,6 +46,12 @@ class StationKeeping(taskbase.ComplexTaskBase):
         super(StationKeeping, self).__init__(**kwargs)
         self.last_wind_direction = None
 
+    def update_waypoint(self, waypoint, waypoint_id = None):
+        self.waypoint = waypoint
+        self.waypoint_id = waypoint_id
+        self.waypoint_xy = Point(
+            self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
+
     def calculate_waypoint_ll(self):
         return self.waypoint
 
