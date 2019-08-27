@@ -4,7 +4,7 @@ from shapely.geometry import Point
 import time
 
 import taskbase
-import heading_planning_laylines
+import heading_planning_laylines_closely
 
 
 class StationKeeping(taskbase.TaskBase):
@@ -33,8 +33,9 @@ class StationKeeping(taskbase.TaskBase):
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
         self.start_time = 0
-        self.head_to_waypoint = heading_planning_laylines.HeadingPlan(nav, self.waypoint, target_radius = radius,
-                                                                      tack_voting_radius = radius)
+        self.head_to_waypoint = heading_planning_laylines_closely.HeadingPlan(nav, self.waypoint, close_factor = 0.8,
+                                                                              target_radius = radius,
+                                                                              tack_voting_radius = radius)
 
         self.debug_topics = [('dbg_heading_to_waypoint', 'Float32'), ('dbg_distance_to_waypoint', 'Float32'),
                              ('dbg_goal_wind_angle', 'Float32'), ]
@@ -62,6 +63,7 @@ class StationKeeping(taskbase.TaskBase):
         """
         dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
         if dwp > self.radius:
+            self.head_to_waypoint.reset()
             return self.head_to_waypoint.calculate_state_and_goal()
 
         self.debug_pub('dbg_distance_to_waypoint', dwp)
