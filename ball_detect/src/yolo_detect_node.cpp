@@ -328,17 +328,39 @@ bool pixel2Heading(const rs2::depth_frame* frame, const rs2_intrinsics* intrin, 
 {
  
  float upoint[3];
+ int step = 10;
  pixel2Point(frame, intrin, upixel, upoint, depth);
  upoint[2] = depthCubicCalibration(upoint[2]);
- float u1[3], dp1, u2[3], dp2, u3[3], dp3, u4[3], dp4;
- if (abs(upoint[2]) < EPSILON) {
+ 
+ int n = 10;
+ int radius = 10;
+ float sum_depth = 0;
+ float sum_x = 0;
+ int cnt = 0;
+ for (int i = 0; i < n; i++) {
+ 	float theta = (i + 1) * (2 * PI / n);
+ 	float c[2], u[3], dp;
+ 	c[0] = center[0] + radius * cos(theta);
+ 	c[1] = center[1] + radius * sin(theta);
+ 	pixel2Point(frame, intrin, c, u, dp);
+ 	if (dp > EPSILON) {
+ 		cnt++;
+ 		sum_depth += dp;
+ 		sum_x += u[0];
+ 	}
+ }
+
+ float x = 1.0 * sum_x / cnt;
+ float d = 1.0 * sum_depth / cnt;
+
+ if (abs(d) < EPSILON) {
    return false;
  }
  else {
-   if (upoint[0] > 0)
-     heading = atan2f(upoint[0], upoint[2]) * 180 / PI;
+   if (x > 0)
+     heading = atan2f(x, d) * 180 / PI;
    else
-     heading = (atan2f(upoint[0], upoint[2]) + PI * 2) * 180 / PI;
+     heading = (atan2f(x, d) + PI * 2) * 180 / PI;
    return true;
  }
 }
