@@ -7,7 +7,8 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
     def __init__(self, *args, **kwargs):
         super(HeadingPlan, self).__init__(*args, **kwargs)
         self.debug_topics.extend(
-            [('dbg_ball_position', 'String'), ('dbg_relative_position_list_len', 'Int16'), ('dbg_keeping', 'Bool'), ])
+            [('dbg_ball_position', 'String'), ('dbg_relative_position_list_len', 'Int16'), ('dbg_keeping', 'Bool'),
+             ('dbg_keep_station_waypoint', 'String'), ])
         self.station_keeping = None
         self.taskdict = {
             'target_radius': self.target_radius,
@@ -34,6 +35,7 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
                 })
                 self.station_keeping = \
                     make_ros_tasks.make_ros_tasks(self.taskdict, self.nav, self.name + '/station_keeping')[0]
+                self.station_keeping.debug_pub = self.debug_pub
 
             return super(HeadingPlan, self).calculate_state_and_goal()
         else:
