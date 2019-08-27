@@ -21,9 +21,10 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
             self.debug_pub('dbg_relative_position_list_len', len(self.nav.relative_position_list))
             if len(self.nav.relative_position_list) > 0:
                 self.nav.calculate_ball_position()
-                self.debug_pub('dbg_ball_position', json.dumps(
-                    [self.nav.ball_position.lat.decimal_degree, self.nav.ball_position.lon.decimal_degree]))
-                self.update_waypoint(self.nav.ball_position)
+                if self.nav.ball_position.distance(self.waypoint) < 10:
+                    self.debug_pub('dbg_ball_position', json.dumps(
+                        [self.nav.ball_position.lat.decimal_degree, self.nav.ball_position.lon.decimal_degree]))
+                    self.update_waypoint(self.nav.ball_position)
             dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
             if dwp < self.target_radius:
                 self.taskdict['tasks'][0].update({
