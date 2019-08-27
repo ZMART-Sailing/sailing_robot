@@ -1,0 +1,3 @@
+<launch>
+   <node name ="rosbag_record" pkg = "rosbag" type = "play" respawn = "false" args = "-r 100 /home/zuzu/fleet_race_second/sailing_robot_2019-08-26-17-01-13.bag" />
+</launch>
