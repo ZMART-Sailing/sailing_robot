@@ -8,7 +8,7 @@ import heading_planning_laylines_closely
 
 
 class StationKeeping(taskbase.TaskBase):
-    def __init__(self, nav, waypoint, linger = 300, radius = 5, wind_angle = 75, waypoint_id = None,
+    def __init__(self, nav, waypoint, linger = 300, radius = 5, accept_radius = 15, wind_angle = 75, waypoint_id = None,
                  kind = 'keep_station', name = '', *args, **kwargs):
         """Machinery to stay near a given point.
         
@@ -29,6 +29,7 @@ class StationKeeping(taskbase.TaskBase):
             self.nav.latlon_to_utm(self.waypoint.lat.decimal_degree, self.waypoint.lon.decimal_degree))
         self.linger = linger
         self.radius = radius
+        self.accept_radius = accept_radius
         self.wind_angle = wind_angle
         self.goal_heading = 0
         self.sailing_state = 'normal'  # sailing state can be 'normal','switch_to_port_tack' or  'switch_to_stbd_tack'
@@ -52,27 +53,28 @@ class StationKeeping(taskbase.TaskBase):
         self.head_to_waypoint.debug_pub = self.debug_pub
         self.head_to_waypoint.log = self.log
 
-    def start(self):
-        self.start_time = time.time()
-
     def check_end_condition(self):
         "Are we done yet?"
-        return time.time() - self.start_time > self.linger
+        return self.start_time is not None and time.time() - self.start_time > self.linger
 
     def calculate_state_and_goal(self):
-        """Work out what we want the boat to do
-        """
-        dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
-        if dwp > self.radius:
-            return self.head_to_waypoint.calculate_state_and_goal()
+        if self.start_time is not None:
+            self.debug_pub('dbg_station_time', time.time() - self.start_time)
+        if self.start_time is None and self.nav.position_ll.distance(self.waypoint) * 1000 <= self.accept_radius:
+            self.start_time = time.time()
+        if self.nav.position_ll.distance(self.waypoint) * 1000 <= self.radius:
+            self.nav.direct = True
+            dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
 
-        self.debug_pub('dbg_distance_to_waypoint', dwp)
-        self.debug_pub('dbg_heading_to_waypoint', hwp)
+            self.debug_pub('dbg_distance_to_waypoint', dwp)
+            self.debug_pub('dbg_heading_to_waypoint', hwp)
 
-        if self.nav.angle_to_wind() < 0:
-            goal_wind_angle = -self.wind_angle
+            if self.nav.angle_to_wind() < 0:
+                goal_wind_angle = -self.wind_angle
+            else:
+                goal_wind_angle = self.wind_angle
+
+            self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
+            return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)
         else:
-            goal_wind_angle = self.wind_angle
-
-        self.debug_pub('dbg_goal_wind_angle', goal_wind_angle)
-        return 'normal', self.nav.wind_angle_to_heading(goal_wind_angle)
+            return self.head_to_waypoint.calculate_state_and_goal()

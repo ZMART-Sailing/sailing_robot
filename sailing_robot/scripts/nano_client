@@ -68,7 +68,10 @@ class Nano_Client():
                 self.velocity.data = jsensor_data['velocity']
                 if len(self.wind_direction_apparent_list) >= self.wind_direction_apparent_len:
                     self.wind_direction_apparent_list.pop()
-                self.wind_direction_apparent_list.insert(0, jsensor_data['wind_direction_apparent'] + self.heading.data)
+                absolute_wind_direction = jsensor_data['wind_direction_apparent'] + self.heading.data
+                if absolute_wind_direction > 360:
+                    absolute_wind_direction -= 360
+                self.wind_direction_apparent_list.insert(0, absolute_wind_direction)
                 # real wind_direction
                 self.wind_direction_apparent.data = self.calculate_wind_direction_apparent()
 
