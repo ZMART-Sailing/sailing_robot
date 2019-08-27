@@ -9,7 +9,7 @@
 # position keeping: 4, 5
 # downwind: 6, 7
 wp/tasks: [
-{"kind": "keep_station_fix_wind_angle", "waypoint": "1"},
+{"kind": "keep_station_two_point", "waypoint": "1"},
   #{"kind": "to_waypoint_keep_station_obstacle", "waypoint": "2"},
 ]
 

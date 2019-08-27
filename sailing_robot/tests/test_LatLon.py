@@ -1,6 +1,10 @@
 import LatLon
 import json
 
+mark = LatLon.LatLon(29.867080, 121.538874)
+
+print mark.offset(mark)
+
 waypoints = [LatLon.LatLon(*waypoint) for waypoint in
              [29.867475, 121.539166], [29.867390, 121.538790], [29.867544, 121.538868], [29.867631, 121.538592],]
 

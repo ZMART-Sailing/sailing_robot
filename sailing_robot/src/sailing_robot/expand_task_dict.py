@@ -67,6 +67,12 @@ def expand_task_dict(wp_params):
                     'radius': wp_task.get('radius', 3),
                     'accept_radius': wp_task.get('accept_radius', 15)
                 })
+            elif kind == 'keep_station_two_point':
+                expanded_task.update({
+                    'linger': wp_task.get('linger', 330),
+                    'radius': wp_task.get('radius', 3),
+                    'accept_radius': wp_task.get('accept_radius', 15)
+                })
             elif kind == 'keep_station_fix_wind_angle':
                 expanded_task.update({
                     'linger': wp_task.get('linger', 330),

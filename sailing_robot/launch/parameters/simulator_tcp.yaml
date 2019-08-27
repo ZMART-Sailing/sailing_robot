@@ -8,11 +8,11 @@
 # position keeping: 4
 # position keeping: 4, 5
 # downwind: 6, 7
-wp/tasks: [
-{"kind": "to_waypoint", "waypoint": "1"},
-{"kind": "to_waypoint_close", "waypoint": "2"},
-{"kind": "to_waypoint_keep_station_obstacle", "waypoint": "3"},
-]
+#wp/tasks: [
+#{"kind": "to_waypoint", "waypoint": "1"},
+#{"kind": "to_waypoint_close", "waypoint": "2"},
+#{"kind": "to_waypoint_keep_station_obstacle", "waypoint": "3"},
+#]
 
 # distance within waypoint is accepted, in [m]
 wp/target_radius: 2.5
