@@ -1,17 +1,17 @@
 <launch>
-    <arg name = "video_device1" default = "/dev/video0" />
-    <arg name = "image_width1"   default = "640"        />
-    <arg name = "image_height1"  default = "480"         />
+    <arg name = "video_device1" default = "/dev/video3" />
+    <arg name = "image_width1"   default = "1280"        />
+    <arg name = "image_height1"  default = "720"         />
     <arg name = "fps1"           default = "30"          />
-    <arg name = "pixel_format1"  default = "yuyv"       />
+    <arg name = "pixel_format1"  default = "mjpeg"       />
     
-    <arg name = "video_device2" default = "/dev/video1" />
+    <arg name = "video_device2" default = "/dev/video4" />
     <arg name = "image_width2"   default = "1280"        />
     <arg name = "image_height2"  default = "720"         />
     <arg name = "fps2"           default = "30"          />
     <arg name = "pixel_format2"  default = "mjpeg"       />
 
-    <arg name = "is_show"       default = "true"       />
+    <arg name = "is_show"       default = "false"       />
 
   <include file="$(find usb_cam)/launch/multi_usb_cam.launch">
     <arg name = "video_device1"  default = "$(arg video_device1)" />
