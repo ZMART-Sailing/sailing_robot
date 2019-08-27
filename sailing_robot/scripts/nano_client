@@ -5,6 +5,7 @@
 import rospy
 import socket
 import json
+import math
 import time
 from std_msgs.msg import String, Float64, Float32
 from sensor_msgs.msg import NavSatFix
@@ -43,6 +44,12 @@ class Nano_Client():
         self.position = NavSatFix()
         self.velocity = Float64()
         self.wind_direction_apparent = Float64()
+        self.wind_direction_apparent_sig = 6
+        self.wind_direction_apparent_len = 20
+        self.wind_direction_apparent_list = []
+        self.wind_direction_apparent_weight_list = [math.exp(-i ** 2 / (2 * self.wind_direction_apparent_sig ** 2)) / (
+                self.wind_direction_apparent_sig * (2 * math.pi) ** 0.5) for i in
+                                                    range(self.wind_direction_apparent_len)]
 
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.connect(address)
@@ -59,8 +66,11 @@ class Nano_Client():
                 self.position.latitude = jsensor_data['latitude'] - 0.0000235
                 self.position.longitude = jsensor_data['longitude'] + 0.00004712
                 self.velocity.data = jsensor_data['velocity']
+                if len(self.wind_direction_apparent_list) >= self.wind_direction_apparent_len:
+                    self.wind_direction_apparent_list.pop()
+                self.wind_direction_apparent_list.insert(0, jsensor_data['wind_direction_apparent'])
                 # real wind_direction
-                self.wind_direction_apparent.data = jsensor_data['wind_direction_apparent']
+                self.wind_direction_apparent.data = self.calculate_wind_direction_apparent()
 
                 # defined wind_direction in default.yaml
                 # self.wind_direction_apparent.data = self.absolute_wind_direction - self.heading.data
@@ -77,6 +87,12 @@ class Nano_Client():
                 print(e)
 
         sock.close()
+
+    def calculate_wind_direction_apparent(self):
+        return sum(
+            [wind_direction_apparent * self.wind_direction_apparent_weight_list[i] for i, wind_direction_apparent in
+             enumerate(self.wind_direction_apparent_list)]) / sum(
+            self.wind_direction_apparent_weight_list[:len(self.wind_direction_apparent_list)])
 
     def rudderservoPWMcontrol(self, rudder_pwm_msg):
         self.pwm_data['rudder_pwm'] = rudder_pwm_msg.data
