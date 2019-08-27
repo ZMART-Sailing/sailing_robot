@@ -17,11 +17,11 @@ class HeadingPlan(heading_planning_laylines.HeadingPlan):
 
     def calculate_real_waypoint(self):
         return self.target.offset(self.nav.position_ll.heading_initial(self.target),
-                                  min(self.target_radius * self.close_factor / 1000.0,
+                                  min(self.accept_radius * self.close_factor / 1000.0,
                                       self.nav.position_ll.distance(self.target)))
 
     def calculate_target_radius(self):
-        return self.target_radius * (1 - self.close_factor) + min(self.target_radius * self.close_factor,
+        return self.accept_radius * (1 - self.close_factor) + min(self.accept_radius * self.close_factor,
                                                                   self.nav.position_ll.distance(self.target) * 1000)
 
     def reset(self):

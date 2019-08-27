@@ -63,7 +63,6 @@ class StationKeeping(taskbase.TaskBase):
         """
         dwp, hwp = self.nav.distance_and_heading(self.waypoint_xy)
         if dwp > self.radius:
-            self.head_to_waypoint.reset()
             return self.head_to_waypoint.calculate_state_and_goal()
 
         self.debug_pub('dbg_distance_to_waypoint', dwp)
