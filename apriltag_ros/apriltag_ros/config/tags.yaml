@@ -22,6 +22,13 @@ standalone_tags:
 { id: 0, size: 0.143,name: 'my_bundle' },
 { id: 1, size: 0.143,name: 'my_bundle' },
 { id: 2, size: 0.143,name: 'my_bundle' },
+{ id: 3, size: 0.143,name: 'my_bundle' },
+{ id: 4, size: 0.143,name: 'my_bundle' },
+{ id: 5, size: 0.143,name: 'my_bundle' },
+{ id: 6, size: 0.143,name: 'my_bundle' },
+{ id: 7, size: 0.143,name: 'my_bundle' },
+{ id: 8, size: 0.143,name: 'my_bundle' },
+{ id: 9, size: 0.143,name: 'my_bundle' },
   ]
 # ## Tag bundle definitions
 # ### Remarks
