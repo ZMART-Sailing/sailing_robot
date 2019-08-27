@@ -38,7 +38,7 @@ class StationKeeping(taskbase.TaskBase):
                                                                               tack_voting_radius = radius)
 
         self.debug_topics = [('dbg_heading_to_waypoint', 'Float32'), ('dbg_distance_to_waypoint', 'Float32'),
-                             ('dbg_goal_wind_angle', 'Float32'), ]
+                             ('dbg_goal_wind_angle', 'Float32'), ].extend(self.head_to_waypoint.debug_topics)
 
     def update_waypoint(self, waypoint, waypoint_id = None):
         self.waypoint = waypoint
