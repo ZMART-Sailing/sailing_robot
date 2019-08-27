@@ -219,7 +219,7 @@ void callback(const darknet_ros_msgs::FoundObject::ConstPtr& detect_msg, const s
     tt += 8*3600;
     tm* t = gmtime(&tt);
     ostringstream convert;
-    convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+    convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << "_" << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
     if (str != convert.str()) {
       str = convert.str();
       cout << "imwrite to: " << "/home/zmart/yolo_detection/" + str + ".jpg" << endl;
