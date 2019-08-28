@@ -21,13 +21,13 @@ if start_line != 1:
     waypoint_list.append(gird_center)
 
 for i in range((21 - start_line) / 2):
-    for i in range(6):
-        gird_center = gird_center.offset(heading_h, lenght * 3)
+    for i in range(3):
+        gird_center = gird_center.offset(heading_h, lenght * 6)
         waypoint_list.append(gird_center)
     gird_center = gird_center.offset(heading_v, lenght)
     waypoint_list.append(gird_center)
-    for i in range(6):
-        gird_center = gird_center.offset(heading_h + 180, lenght * 3)
+    for i in range(3):
+        gird_center = gird_center.offset(heading_h + 180, lenght * 6)
         waypoint_list.append(gird_center)
     gird_center = gird_center.offset(heading_v, lenght)
     waypoint_list.append(gird_center)
