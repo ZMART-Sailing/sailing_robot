@@ -21,12 +21,14 @@ if start_line != 1:
     waypoint_list.append(gird_center)
 
 for i in range((21 - start_line) / 2):
-    gird_center = gird_center.offset(heading_h, lenght * 18)
-    waypoint_list.append(gird_center)
+    for i in range(18):
+        gird_center = gird_center.offset(heading_h, lenght)
+        waypoint_list.append(gird_center)
     gird_center = gird_center.offset(heading_v, lenght)
     waypoint_list.append(gird_center)
-    gird_center = gird_center.offset(heading_h + 180, lenght * 18)
-    waypoint_list.append(gird_center)
+    for i in range(18):
+        gird_center = gird_center.offset(heading_h + 180, lenght)
+        waypoint_list.append(gird_center)
     gird_center = gird_center.offset(heading_v, lenght)
     waypoint_list.append(gird_center)
 print('''# CAUTION:
