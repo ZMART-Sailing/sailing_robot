@@ -76,7 +76,7 @@ class Nano_Client():
                 # self.wind_direction_apparent.data = self.calculate_wind_direction_apparent()
 
                 # defined wind_direction in default.yaml
-                self.wind_direction_apparent.data = 203 - self.heading.data
+                self.wind_direction_apparent.data = 30 - self.heading.data
 
                 if self.wind_direction_apparent.data < 0:
                     self.wind_direction_apparent.data += 360.0
