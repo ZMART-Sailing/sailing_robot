@@ -274,6 +274,12 @@ class Debugging_2D_matplot():
 
         # display Waypoints
         # print self.dbg_keep_station_waypoint
+        if self.wpfig is not None:
+            self.wpfig.set_visible(False)
+        if self.wp_array is not None:
+            self.wpfig = plt.scatter(self.wp_array[0], self.wp_array[1], c = C[3])
+
+        # print self.dbg_keep_station_waypoint
         if self.wp_update_fig is not None:
             self.wp_update_fig.set_visible(False)
         if self.dbg_keep_station_waypoint is not None:
