@@ -52,5 +52,6 @@ wp/tack_voting_radius: 5
 #''')
 print('wp/table: {')
 for i in range(len(waypoint_list)):
-    print('"{0}": [{1}, {2}],'.format(i + 1, waypoint_list[i].lat.decimal_degree, waypoint_list[i].lon.decimal_degree))
+    print(
+        '  "{0}": [{1}, {2}],'.format(i + 1, waypoint_list[i].lat.decimal_degree, waypoint_list[i].lon.decimal_degree))
 print('}')
