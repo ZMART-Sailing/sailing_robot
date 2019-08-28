@@ -4,14 +4,16 @@ left_top_point = LatLon.LatLon(29.867690, 121.538516)
 left_down_point = LatLon.LatLon(29.867194, 121.538264)
 right_top_point = LatLon.LatLon(29.867497, 121.539127)
 right_down_point = LatLon.LatLon(29.867029, 121.538858)
+
+start_point = left_top_point
 start_line = 0
 
-heading_v = left_top_point.heading_initial(left_down_point)
-heading_h = left_top_point.heading_initial(right_top_point)
+heading_v = start_point.heading_initial(left_down_point)
+heading_h = start_point.heading_initial(right_top_point)
 lenght = 2.5
 lenght /= 1000.0
 
-gird_center = left_top_point.offset(heading_v, lenght).offset(heading_v + 90, lenght)
+gird_center = start_point.offset(heading_v, lenght).offset(heading_h, lenght)
 
 waypoint_list = []
 
