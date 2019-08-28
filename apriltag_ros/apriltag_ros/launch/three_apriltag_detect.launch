@@ -56,7 +56,7 @@
 
   <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml" ns="$(arg ns3)" />
   <rosparam command="load" file="$(find apriltag_ros)/config/tags.yaml"     ns="$(arg ns3)" />
-
+  <include file = "$(find realsense2_camera)/launch/rs_camera.launch" />
   <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns3)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="image_rect"  to="/camera/color/image_raw" />
     <remap from="camera_info" to="/camera/color/camera_info" />
