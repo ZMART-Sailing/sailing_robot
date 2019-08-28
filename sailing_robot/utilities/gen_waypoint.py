@@ -3,7 +3,7 @@ import LatLon
 left_down_point = LatLon.LatLon(29.867194, 121.538264)
 left_top_point = LatLon.LatLon(29.867690, 121.538516)
 right_down_point = LatLon.LatLon(29.867029, 121.538858)
-start_line = 5
+start_line = 10
 
 heading_v = left_down_point.heading_initial(left_top_point)
 heading_h = left_down_point.heading_initial(right_down_point)
@@ -15,22 +15,20 @@ gird_center = left_down_point.offset(heading_v, lenght).offset(heading_v + 90, l
 waypoint_list = []
 
 waypoint_list.append(gird_center)
-gird_center = gird_center.offset(heading_v, lenght * 18)
-waypoint_list.append(gird_center)
-#
-# gird_center = gird_center.offset(heading_v, lenght * (start_line - 1))
-# if start_line != 1:
-#     waypoint_list.append(gird_center)
-#
-# for i in range((21 - start_line) / 2):
-#     gird_center = gird_center.offset(heading_h, lenght * 18)
-#     waypoint_list.append(gird_center)
-#     gird_center = gird_center.offset(heading_v, lenght)
-#     waypoint_list.append(gird_center)
-#     gird_center = gird_center.offset(heading_h + 180, lenght * 18)
-#     waypoint_list.append(gird_center)
-#     gird_center = gird_center.offset(heading_v, lenght)
-#     waypoint_list.append(gird_center)
+
+gird_center = gird_center.offset(heading_v, lenght * (start_line - 1))
+if start_line != 1:
+    waypoint_list.append(gird_center)
+
+for i in range((21 - start_line) / 2):
+    gird_center = gird_center.offset(heading_h, lenght * 18)
+    waypoint_list.append(gird_center)
+    gird_center = gird_center.offset(heading_v, lenght)
+    waypoint_list.append(gird_center)
+    gird_center = gird_center.offset(heading_h + 180, lenght * 18)
+    waypoint_list.append(gird_center)
+    gird_center = gird_center.offset(heading_v, lenght)
+    waypoint_list.append(gird_center)
 print('''# CAUTION:
 # Some of these waypoints may not be suitable in all tide conditions!!
 # for simplified entry of path, simply add list of waypoint names
