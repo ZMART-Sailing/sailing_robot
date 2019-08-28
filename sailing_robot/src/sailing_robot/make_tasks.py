@@ -8,6 +8,7 @@ import station_keeping_two_point
 import station_keeping_points
 import station_keeping_fix_wind_angle
 import station_keeping_obstacle
+import area_scanning
 import return_to_safety
 import jibe_tack_now
 import timeout
@@ -21,6 +22,7 @@ build_task_dict = {
     'keep_station_three_point': station_keeping_points.StationKeeping,
     'keep_station_fix_wind_angle': station_keeping_fix_wind_angle.StationKeeping,
     'keep_station_obstacle': station_keeping_obstacle.StationKeeping,
+    'area_scanning': area_scanning.AreaScanning,
     'return_to_safety_zone': return_to_safety.ReturnToSafetyZone,
     'start_timer': timeout.StartTimer,
     'jibe_tack_now': jibe_tack_now.JibeTackNow

@@ -100,6 +100,13 @@ def expand_task_dict(wp_params):
                     'max_radius': wp_task.get('max_radius', 5),
                     'accept_radius': wp_task.get('accept_radius', 20)
                 })
+            elif kind == 'area_scanning':
+                expanded_task.update({
+                    'close_factor': wp_task.get('close_factor', 0.8),
+                    'heading': wp_task.get('heading', 0),
+                    'start_line': wp_task.get('start_line', 0),
+                    'length': wp_task.get('length', 2.5)
+                })
             elif kind == 'start_timer':
                 expanded_task = wp_task.copy()
             else:

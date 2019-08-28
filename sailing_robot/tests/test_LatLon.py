@@ -2,6 +2,13 @@ import LatLon
 import json
 
 mark = LatLon.LatLon(29.867080, 121.538874)
+wp1 = LatLon.LatLon(29.867690, 121.538516)
+wp2 = LatLon.LatLon(29.867194, 121.538264)
+wp3 = LatLon.LatLon(29.867497, 121.539127)
+wp4 = LatLon.LatLon(29.867029, 121.538858)
+
+print wp2.heading_initial(wp1)
+print wp2.heading_initial(wp4)
 
 print mark.offset(mark)
 
