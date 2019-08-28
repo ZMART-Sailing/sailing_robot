@@ -15,7 +15,7 @@
     <rosparam file="$(find sailing_robot)/launch/parameters/rudder_settings.yaml" command="load"/>
     <rosparam file="$(find sailing_robot)/launch/parameters/sail_settings.yaml" command="load"/>
 
-    <rosparam file="$(find sailing_robot)/launch/parameters/simulator_tcp.yaml" command="load"/>
+    <rosparam file="$(find sailing_robot)/launch/parameters/area_scanning.yaml" command="load"/>
 
     <rosparam file="$(find sailing_robot)/launch/parameters/simulator.yaml" command="load"/>
 

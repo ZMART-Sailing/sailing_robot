@@ -68,9 +68,10 @@ class Wind_simu():
             wind_vector_boat = ((self.wind_speed + noise_speed)* math.cos(math.radians(wind_direction_boat )),
                                 - (self.wind_speed + noise_speed)* math.sin(math.radians(wind_direction_boat)),)
 
-            wind_apparent = (self.velocity[0] + wind_vector_boat[0],
-                             self.velocity[1] + wind_vector_boat[1],) 
-
+            wind_apparent = (wind_vector_boat[0],
+                             wind_vector_boat[1],) 
+            # wind_apparent = (self.velocity[0] + wind_vector_boat[0],
+            #                  self.velocity[1] + wind_vector_boat[1],) 
 
             wind_speed_apparent = math.sqrt(wind_apparent[0]**2 + wind_apparent[1]**2)
             wind_direction_apparent = ( math.degrees(- math.atan2(wind_apparent[1], wind_apparent[0]))) % 360

@@ -3,7 +3,7 @@ import LatLon
 left_down_point = LatLon.LatLon(29.867194, 121.538264)
 left_top_point = LatLon.LatLon(29.867690, 121.538516)
 right_down_point = LatLon.LatLon(29.867029, 121.538858)
-start_line = 10
+start_line = 9
 
 heading_v = left_down_point.heading_initial(left_top_point)
 heading_h = left_down_point.heading_initial(right_down_point)
