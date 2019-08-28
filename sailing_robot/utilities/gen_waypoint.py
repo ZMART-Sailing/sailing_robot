@@ -23,8 +23,7 @@ heading_h = start_point.heading_initial(points[~start_point_id[0]][start_point_i
 
 heading_sail, heading_change = (heading_h, heading_v) if h_sail else (heading_v, heading_h)
 
-lenght = 2.5
-lenght /= 1000.0
+lenght = sum([points[i][i].distance(points[~i][i]) + points[i][i].distance(points[i][~i]) for i in range(2)]) / 4
 
 gird_center = start_point.offset(heading_change, lenght).offset(heading_sail, lenght)
 
