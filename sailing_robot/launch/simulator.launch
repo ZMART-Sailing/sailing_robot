@@ -7,6 +7,7 @@
     Parameters
     -->
 
+    <include file = "$(find apriltag_ros)/launch/single_apriltag_detect.launch" />
 
     <rosparam file="$(find sailing_robot)/launch/parameters/default.yaml" command="load"/>
 
@@ -42,6 +43,6 @@
 
     <node name="simulation_gps_fix" pkg="sailing_robot" type="simulation_gps_fix"/>
     <!--node name="debugging_gps_log" pkg='sailing_robot' type="debugging_gps_log"/-->
-
+    <node name ="rosbag_record" pkg = "rosbag" type = "record" respawn = "true" args = "/position /usb_cam/image_raw /tag_detections /tag_detections_image  -o /home/zuzu/sailing_robot" />  
     <node name="debugging_dashboard" pkg="sailing_robot" type="debugging_dashboard"/>
 </launch>
