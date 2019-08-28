@@ -44,7 +44,7 @@
 #define APRILTAG_ROS_CONTINUOUS_DETECTOR_H
 
 #include "apriltag_ros/common_functions.h"
-
+#include <sensor_msgs/NavSatFix.h>
 #include <memory>
 
 #include <nodelet/nodelet.h>
@@ -61,9 +61,7 @@ class ContinuousDetector: public nodelet::Nodelet
 
   void imageCallback(const sensor_msgs::ImageConstPtr& image_rect,
                      const sensor_msgs::CameraInfoConstPtr& camera_info);
-  // add by zjc 2019/7/21
-  void orientCallback(const std_msgs::Bool msg);
-  bool boat_orient_;
+
  private:
   std::shared_ptr<TagDetector> tag_detector_;
   bool draw_tag_detections_image_;
@@ -73,8 +71,13 @@ class ContinuousDetector: public nodelet::Nodelet
   image_transport::CameraSubscriber camera_image_subscriber_;
   image_transport::Publisher tag_detections_image_publisher_;
   ros::Publisher tag_detections_publisher_;
-
-
+  // add by zjc 2019/7/21
+  ros::Subscriber boat_ori_subscriber_;
+  ros::Subscriber boat_pos_subscriber_;
+  void orientCallback(const std_msgs::Bool msg);
+  void posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg);
+  bool boat_orient_;
+  sensor_msgs::NavSatFix boat_pos_ = sensor_msgs::NavSatFix();
 };
 
 } // namespace apriltag_ros

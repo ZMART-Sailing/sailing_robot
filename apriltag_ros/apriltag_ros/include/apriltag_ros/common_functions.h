@@ -61,7 +61,7 @@
 #include <image_transport/image_transport.h>
 #include <sensor_msgs/image_encodings.h>
 #include <tf/transform_broadcaster.h>
-
+#include <sensor_msgs/NavSatFix.h>
 #include <apriltag.h>
 
 #include "apriltag_ros/AprilTagDetection.h"
@@ -182,6 +182,7 @@ class TagDetector
   bool publish_tf_;
   tf::TransformBroadcaster tf_pub_;
   std::string camera_tf_frame_;
+  
 
  public:
 
@@ -212,6 +213,7 @@ class TagDetector
   AprilTagDetectionArray detectTags(
       const cv_bridge::CvImagePtr& image,
       const sensor_msgs::CameraInfoConstPtr& camera_info,
+      const sensor_msgs::NavSatFix& boat_pos,
       const bool boat_orient = false);
 
   // Get the pose of the tag in the camera frame
@@ -232,7 +234,10 @@ class TagDetector
                        std::vector<cv::Point3d >& objectPoints) const;
 
   // Draw the detected tags' outlines and payload values on the image
-  void drawDetections(cv_bridge::CvImagePtr image);
+  void drawDetections(cv_bridge::CvImagePtr image, const sensor_msgs::NavSatFix& boat_pos);
+
+  //add this boolean variable to save detected image
+  bool isFound = false;
 };
 
 } // namespace apriltag_ros

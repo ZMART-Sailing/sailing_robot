@@ -82,14 +82,14 @@ bool SingleImageDetector::analyzeImage(
   loaded_image->header.frame_id = "camera";
   response.tag_detections =
       tag_detector_.detectTags(loaded_image,sensor_msgs::CameraInfoConstPtr(
-          new sensor_msgs::CameraInfo(request.camera_info)), true);
+          new sensor_msgs::CameraInfo(request.camera_info)), sensor_msgs::NavSatFix(), true);
 
   // Publish detected tags (AprilTagDetectionArray, basically an array of
   // geometry_msgs/PoseWithCovarianceStamped)
   tag_detections_publisher_.publish(response.tag_detections);
 
   // Save tag detections image
-  tag_detector_.drawDetections(loaded_image);
+  tag_detector_.drawDetections(loaded_image, sensor_msgs::NavSatFix());
   cv::imwrite(request.full_path_where_to_save_image, loaded_image->image);
 
   ROS_INFO("Done!\n");

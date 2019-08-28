@@ -58,8 +58,8 @@ void ContinuousDetector::onInit ()
       it_->subscribeCamera("image_rect", 1,
                           &ContinuousDetector::imageCallback, this);
 
-  ros::Subscriber sub = nh.subscribe("boat_orient", 1, &ContinuousDetector::orientCallback, this);
-
+  boat_ori_subscriber_ = nh.subscribe("boat_orient", 1, &ContinuousDetector::orientCallback, this);
+  boat_pos_subscriber_ = nh.subscribe("boat_pos", 1, &ContinuousDetector::posCallBack, this);
   tag_detections_publisher_ =
       nh.advertise<AprilTagDetectionArray>("tag_detections", 1);
   if (draw_tag_detections_image_)
@@ -71,9 +71,11 @@ void ContinuousDetector::onInit ()
 void ContinuousDetector::orientCallback(
     const std_msgs::Bool msg)
 {
-  cout << "in callback: " << endl;
   boat_orient_ = msg.data;
-
+}
+void ContinuousDetector::posCallBack(const sensor_msgs::NavSatFix::ConstPtr& msg) {
+  boat_pos_.latitude = msg->latitude;
+  boat_pos_.longitude = msg->longitude;
 }
 
 void ContinuousDetector::imageCallback (
@@ -95,13 +97,13 @@ void ContinuousDetector::imageCallback (
 
   // Publish detected tags in the image by AprilTag 2
   tag_detections_publisher_.publish(
-      tag_detector_->detectTags(cv_image_,camera_info,boat_orient_));
+      tag_detector_->detectTags(cv_image_,camera_info,boat_pos_,boat_orient_));
 
   // Publish the camera image overlaid by outlines of the detected tags and
   // their payload values
   if (draw_tag_detections_image_)
   {
-    tag_detector_->drawDetections(cv_image_);
+    tag_detector_->drawDetections(cv_image_, boat_pos_);
     tag_detections_image_publisher_.publish(cv_image_->toImageMsg());
   }
 }

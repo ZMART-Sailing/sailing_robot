@@ -21,10 +21,12 @@
   <rosparam command="load" file="$(find apriltag_ros)/config/settings.yaml" ns="$(arg ns1)" />
   <rosparam command="load" file="$(find apriltag_ros)/config/tags.yaml"     ns="$(arg ns1)" />
   
+  <!-- <include file = "$(find ball_detect)/launch/sim_gps.launch" /> -->
   <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns1)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="image_rect"  to="/usb_cam/image_raw" />
     <remap from="camera_info" to="/usb_cam/camera_info" />
     <remap from="boat_orient" to="/boat_orient" />
+    <remap from="boat_pos"    to="/position"    />
     <param name="camera_frame" type="str" value="/camera" />
     <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
   </node>

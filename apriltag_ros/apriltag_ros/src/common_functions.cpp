@@ -176,10 +176,9 @@ TagDetector::~TagDetector() {
 AprilTagDetectionArray TagDetector::detectTags (
     const cv_bridge::CvImagePtr& image,
     const sensor_msgs::CameraInfoConstPtr& camera_info,
+    const sensor_msgs::NavSatFix& boat_pos,
     const bool boat_orient) {
   // Convert image to AprilTag code's format
-//  cout << "in TagDetector :" << boat_orient << endl;
-  cout << camera_tf_frame_ << endl;
   cv::Mat gray_image;
   if (image->image.channels() == 1)
   {
@@ -279,7 +278,6 @@ AprilTagDetectionArray TagDetector::detectTags (
     if (!findStandaloneTagDescription(tagID, standaloneDescription,
                                       !is_part_of_bundle))
     {
-      cout << "continue" << endl;
       continue;
     }
 
@@ -383,6 +381,7 @@ AprilTagDetectionArray TagDetector::detectTags (
   }
   // if at least one tag is detected, save the image
   if (!tag_detection_array.detections.empty()) {
+    isFound = true;
     time_t tt;
     time(&tt);
     tt += 8*3600;
@@ -391,8 +390,18 @@ AprilTagDetectionArray TagDetector::detectTags (
     ostringstream convert;
     convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
     str = convert.str();
-    cout << "imwrite to: " << "/home/zmart/tag_detect/" + str + ".jpg" << endl;
-    cv::imwrite("/home/zmart/tag_detect/" + str + ".jpg", image->image);
+    cout << "imwrite to: " << "/home/zuzu/tag_detect/" + str + ".jpg" << endl;
+    cv::Mat img = image->image;
+    ostringstream ll;
+    ll.precision(10);
+    ll << boat_pos.latitude << " ," << boat_pos.longitude;
+    string str_ll;
+    str_ll = ll.str();
+    cv::putText(img, str_ll, cv::Point(50,60),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,23,0),4,8);
+    cv::imwrite("/home/zuzu/tag_detect/" + str + ".jpg", img);
+  }
+  else {
+    isFound = false;
   }
 
   return tag_detection_array;
@@ -527,7 +536,7 @@ geometry_msgs::PoseWithCovarianceStamped TagDetector::makeTagPose(
   return pose;
 }
 
-void TagDetector::drawDetections (cv_bridge::CvImagePtr image)
+void TagDetector::drawDetections (cv_bridge::CvImagePtr image, const sensor_msgs::NavSatFix& boat_pos)
 {
   for (int i = 0; i < zarray_size(detections_); i++)
   {
@@ -587,6 +596,26 @@ void TagDetector::drawDetections (cv_bridge::CvImagePtr image)
                 cv::Point((int)(det->c[0]-textsize.width/2),
                           (int)(det->c[1]+textsize.height/2)),
                 fontface, fontscale, cv::Scalar(0xff, 0x99, 0), 2);
+
+    if (isFound) {
+      time_t tt;
+      time(&tt);
+      tt += 8*3600;
+      tm* t = gmtime(&tt);
+      string str;
+      ostringstream convert;
+      convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
+      str = convert.str();
+      cout << "imwrite to: " << "/home/zuzu/detect/" + str + ".jpg" << endl;
+      cv::Mat img = image->image;
+      ostringstream ll;
+      ll.precision(10);
+      ll << boat_pos.latitude << " ," << boat_pos.longitude;
+      string str_ll;
+      str_ll = ll.str();
+      cv::putText(img, str_ll, cv::Point(50,60),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,23,0),4,8);
+      cv::imwrite("/home/zuzu/detect/" + str + ".jpg", img);      
+    }
   }
 }
 
