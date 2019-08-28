@@ -39,7 +39,7 @@ print('''# CAUTION:
 # position keeping: 4
 # position keeping: 4, 5
 # downwind: 6, 7''')
-print('wp/tasks:[')
+print('wp/tasks: [')
 for i in range(len(waypoint_list)):
     print('{{"kind": "to_waypoint", "waypoint": "{0}", "target_radius": 2.5, "tack_voting_radius": 5}},'.format(i + 1))
 print(''']
@@ -50,7 +50,7 @@ wp/tack_voting_radius: 5
 
 # Dictionary for looking up waypoints, using [lat, lon] format of NavSatFix
 #''')
-print('wp/table:{')
+print('wp/table: {')
 for i in range(len(waypoint_list)):
     print('"{0}": [{1}, {2}],'.format(i + 1, waypoint_list[i].lat.decimal_degree, waypoint_list[i].lon.decimal_degree))
 print('}')
