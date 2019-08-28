@@ -55,7 +55,7 @@ nav/absolute_wind_direction: 200
 # Helming Procedure
 #
 # True to turn by jibing preferably instead of tacking:
-procedure/jibe_to_turn: false
+procedure/jibe_to_turn: true
 
 # Timeout after wich a procedure is considered as failed
 procedure/timeout: 15 #in second
@@ -64,7 +64,7 @@ procedure/timeout: 15 #in second
 # If the coefficient is 0: the fastest procedure that works will always be chosen
 # If the coefficient is 1: all the procedures will be tried randomly at first
 # If the coefficient is 0.3: 30% of the time an untested procedure will be tried
-procedure/exploration_coefficient: 0.3 #number between 0 and 1
+procedure/exploration_coefficient: 0 #number between 0 and 1
 
 
 #

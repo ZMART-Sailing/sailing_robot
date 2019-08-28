@@ -18,12 +18,12 @@ points[1].append(right_down_point)
 
 start_point = points[start_point_id[0]][start_point_id[1]]
 
-heading_v = start_point.heading_initial(points[start_point_id[0]][~start_point_id[1]])
-heading_h = start_point.heading_initial(points[~start_point_id[0]][start_point_id[1]])
+heading_h = start_point.heading_initial(points[start_point_id[0]][~start_point_id[1]])
+heading_v = start_point.heading_initial(points[~start_point_id[0]][start_point_id[1]])
 
 heading_sail, heading_change = (heading_h, heading_v) if h_sail else (heading_v, heading_h)
 
-lenght = sum([points[i][i].distance(points[~i][i]) + points[i][i].distance(points[i][~i]) for i in range(2)]) / 4
+lenght = sum([points[i][i].distance(points[~i][i]) + points[i][i].distance(points[i][~i]) for i in range(2)]) / (4 * 19)
 
 gird_center = start_point.offset(heading_change, lenght).offset(heading_sail, lenght)
 
