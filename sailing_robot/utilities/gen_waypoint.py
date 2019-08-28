@@ -21,42 +21,44 @@ start_point = points[start_point_id[0]][start_point_id[1]]
 heading_h = start_point.heading_initial(points[start_point_id[0]][~start_point_id[1]])
 heading_v = start_point.heading_initial(points[~start_point_id[0]][start_point_id[1]])
 
+length_h = sum([points[i][0].distance(points[i][1]) for i in range(2)]) / (2 * 20)
+length_v = sum([points[0][i].distance(points[1][i]) for i in range(2)]) / (2 * 20)
+
 heading_sail, heading_change = (heading_h, heading_v) if h_sail else (heading_v, heading_h)
+length_sail, length_change = (length_h, length_v) if h_sail else (length_v, length_h)
 
-lenght = sum([points[i][i].distance(points[~i][i]) + points[i][i].distance(points[i][~i]) for i in range(2)]) / (4 * 19)
-
-gird_center = start_point.offset(heading_change, lenght).offset(heading_sail, lenght)
+gird_center = start_point.offset(heading_change, length_change).offset(heading_sail, length_sail)
 
 waypoint_list = []
 
 waypoint_list.append(gird_center)
 
-gird_center = gird_center.offset(heading_change, lenght * start_line)
+gird_center = gird_center.offset(heading_change, length_change * start_line)
 if start_line:
     waypoint_list.append(gird_center)
 
 for i in range((20 - start_line) / 2):
     if h_sail:
         for i in range(3):
-            gird_center = gird_center.offset(heading_sail, lenght * 6)
+            gird_center = gird_center.offset(heading_sail, length_sail * 6)
             waypoint_list.append(gird_center)
-        gird_center = gird_center.offset(heading_change, lenght)
+        gird_center = gird_center.offset(heading_change, length_change)
         waypoint_list.append(gird_center)
         for i in range(3):
-            gird_center = gird_center.offset(heading_sail + 180, lenght * 6)
+            gird_center = gird_center.offset(heading_sail + 180, length_sail * 6)
             waypoint_list.append(gird_center)
-        gird_center = gird_center.offset(heading_change, lenght)
+        gird_center = gird_center.offset(heading_change, length_change)
         waypoint_list.append(gird_center)
     else:
         for i in range(2):
-            gird_center = gird_center.offset(heading_sail, lenght * 5)
+            gird_center = gird_center.offset(heading_sail, length_sail * 5)
             waypoint_list.append(gird_center)
-        gird_center = gird_center.offset(heading_change, lenght)
+        gird_center = gird_center.offset(heading_change, length_change)
         waypoint_list.append(gird_center)
         for i in range(2):
-            gird_center = gird_center.offset(heading_sail + 180, lenght * 5)
+            gird_center = gird_center.offset(heading_sail + 180, length_sail * 5)
             waypoint_list.append(gird_center)
-        gird_center = gird_center.offset(heading_change, lenght)
+        gird_center = gird_center.offset(heading_change, length_change)
         waypoint_list.append(gird_center)
 print('''# CAUTION:
 # Some of these waypoints may not be suitable in all tide conditions!!
