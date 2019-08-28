@@ -40,6 +40,7 @@
   <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns1)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="image_rect"  to="/usb_cam1/image_raw" />
     <remap from="camera_info" to="/usb_cam1/camera_info" />
+    <remap from="boat_pos"    to="/position"    />
     <param name="camera_frame" type="str" value="/camera1" />
     <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
   </node>
@@ -50,6 +51,7 @@
   <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns2)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="image_rect"  to="/usb_cam2/image_raw" />
     <remap from="camera_info" to="/usb_cam2/camera_info" />
+    <remap from="boat_pos"    to="/position"    />
     <param name="camera_frame" type="str" value="/camera2" />
     <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
   </node>
@@ -60,6 +62,7 @@
   <node pkg="apriltag_ros" type="apriltag_ros_continuous_node" name="$(arg ns3)" clear_params="true" output="screen" launch-prefix="$(arg launch_prefix)">
     <remap from="image_rect"  to="/camera/color/image_raw" />
     <remap from="camera_info" to="/camera/color/camera_info" />
+    <remap from="boat_pos"    to="/position"    />
     <param name="camera_frame" type="str" value="/camera3" />
     <param name="publish_tag_detections_image" type="bool" value="true" />      <!-- default: false -->
   </node>

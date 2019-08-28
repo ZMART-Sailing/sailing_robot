@@ -390,7 +390,7 @@ AprilTagDetectionArray TagDetector::detectTags (
     ostringstream convert;
     convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
     str = convert.str();
-    cout << "imwrite to: " << "/home/zuzu/tag_detect/" + str + ".jpg" << endl;
+    cout << "imwrite to: " << "/home/zmart/tag_detect/" + str + ".jpg" << endl;
     cv::Mat img = image->image;
     ostringstream ll;
     ll.precision(10);
@@ -398,7 +398,7 @@ AprilTagDetectionArray TagDetector::detectTags (
     string str_ll;
     str_ll = ll.str();
     cv::putText(img, str_ll, cv::Point(50,60),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,23,0),4,8);
-    cv::imwrite("/home/zuzu/tag_detect/" + str + ".jpg", img);
+    cv::imwrite("/home/zmart/tag_detect/" + str + ".jpg", img);
   }
   else {
     isFound = false;
@@ -606,7 +606,7 @@ void TagDetector::drawDetections (cv_bridge::CvImagePtr image, const sensor_msgs
       ostringstream convert;
       convert << t->tm_year + 1900 << "-" << t->tm_mon + 1 << "-" << t->tm_mday << " " << t->tm_hour << ":" << t->tm_min << ":" << t->tm_sec;
       str = convert.str();
-      cout << "imwrite to: " << "/home/zuzu/detect/" + str + ".jpg" << endl;
+      cout << "imwrite to: " << "/home/zmart/detect/" + str + ".jpg" << endl;
       cv::Mat img = image->image;
       ostringstream ll;
       ll.precision(10);
@@ -614,7 +614,7 @@ void TagDetector::drawDetections (cv_bridge::CvImagePtr image, const sensor_msgs
       string str_ll;
       str_ll = ll.str();
       cv::putText(img, str_ll, cv::Point(50,60),cv::FONT_HERSHEY_SIMPLEX,1,cv::Scalar(255,23,0),4,8);
-      cv::imwrite("/home/zuzu/detect/" + str + ".jpg", img);      
+      cv::imwrite("/home/zmart/detect/" + str + ".jpg", img);      
     }
   }
 }
