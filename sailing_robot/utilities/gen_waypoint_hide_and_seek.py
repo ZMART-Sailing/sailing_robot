@@ -4,17 +4,10 @@ close_distance = 3
 close_sail_len = 10
 close = True
 
-points = [[], []]
-
 fir_start_point = LatLon.LatLon(29.867690, 121.538516)
 fir_end_point = LatLon.LatLon(29.867194, 121.538264)
 sec_start_point = LatLon.LatLon(29.867497, 121.539127)
 sec_end_point = LatLon.LatLon(29.867029, 121.538858)
-
-points[0].append(fir_start_point)
-points[0].append(fir_end_point)
-points[1].append(sec_start_point)
-points[1].append(sec_end_point)
 
 fir_len = fir_start_point.distance(fir_end_point)
 offset = (fir_len - close_sail_len / 1000.0) / 2
