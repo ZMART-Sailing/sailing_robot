@@ -4,10 +4,10 @@ close_distance = 3
 close_sail_len = 30
 close = True
 
-fir_start_point = LatLon.LatLon(29.867690, 121.538516)
-fir_end_point = LatLon.LatLon(29.867194, 121.538264)
-sec_start_point = LatLon.LatLon(29.867497, 121.539127)
-sec_end_point = LatLon.LatLon(29.867029, 121.538858)
+fir_start_point = LatLon.LatLon(29.867226, 121.538963)
+fir_end_point = LatLon.LatLon(29.867387, 121.538414)
+sec_start_point = LatLon.LatLon(29.867366, 121.539045)
+sec_end_point = LatLon.LatLon(29.867526, 121.538496)
 
 fir_len = fir_start_point.distance(fir_end_point)
 offset = (fir_len - close_sail_len / 1000.0) / 2
