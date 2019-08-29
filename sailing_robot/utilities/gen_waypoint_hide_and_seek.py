@@ -1,7 +1,7 @@
 import LatLon
 
 close_distance = 3
-close_sail_len = 10
+close_sail_len = 30
 close = True
 
 fir_start_point = LatLon.LatLon(29.867690, 121.538516)
