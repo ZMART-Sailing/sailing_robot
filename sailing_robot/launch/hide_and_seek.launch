@@ -44,7 +44,7 @@
     <!--    base station gps cannot use with pixhawk at same time-->
     <include file="$(find correction_receiver_ros)/launch/correction_receiver_ros.launch"/>
 
-    <include file="$(find apriltag_ros)/launch/three_apriltag_detection.launch"/>
+<!--    <include file="$(find apriltag_ros)/launch/three_apriltag_detection.launch"/>-->
 
     <node name="client_tcp" pkg="sailing_robot" type="client_tcp"/>
     <node name="rosbag_record" pkg="rosbag" type="record" respawn="true" args="/position -o /home/zmart/sailing_robot"/>
