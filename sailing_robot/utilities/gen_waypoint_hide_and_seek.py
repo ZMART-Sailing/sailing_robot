@@ -12,7 +12,7 @@ sec_end_point = LatLon.LatLon(29.867029, 121.538858)
 fir_len = fir_start_point.distance(fir_end_point)
 offset = (fir_len - close_sail_len / 1000.0) / 2
 fir_close_point = fir_start_point.offset(fir_start_point.heading_initial(fir_end_point), offset).offset(
-    fir_start_point.heading_initial(sec_start_point), close_distance / 1000.0)
+    fir_start_point.heading_initial(sec_start_point) + (0 if close else 180), close_distance / 1000.0)
 sec_close_point = fir_close_point.offset(sec_start_point.heading_initial(sec_end_point), close_sail_len / 1000.0)
 
 waypoint_list = []
