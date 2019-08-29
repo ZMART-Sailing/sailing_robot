@@ -14,7 +14,7 @@
 
   <arg name = "is_show"       default = "true"        />
 
-  <node name="usb_cam1" pkg="usb_cam" type="usb_cam_node" output="screen" >
+  <node name="usb_cam1" pkg="usb_cam" type="usb_cam_node">
     <param name="video_device" value="$(arg video_device1)" />
     <param name="image_width" value="$(arg image_width1)"    />
     <param name="image_height" value="$(arg image_height1)"  />
@@ -24,7 +24,7 @@
     <param name="io_method" value="mmap"/>
   </node>
 
-  <node name="usb_cam2" pkg="usb_cam" type="usb_cam_node" output="screen" >
+  <node name="usb_cam2" pkg="usb_cam" type="usb_cam_node">
     <param name="video_device" value="$(arg video_device2)" />
     <param name="image_width" value="$(arg image_width2)"    />
     <param name="image_height" value="$(arg image_height2)"  />
