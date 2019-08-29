@@ -6,7 +6,8 @@
 # CAUTION: include 0 angle and 180 angle, since those are the initial values in the lookup script
 
 sailsettings/table: {'0': 0,
-                     '90': 0,
+                     '45': 0,
+                     '90': 0.1,
                      '180': 1,
 }
 
