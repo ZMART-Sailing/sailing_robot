@@ -10,19 +10,19 @@
 # downwind: 6, 7
 
 
-#wp/tasks: [
-#{"kind": "to_waypoint", "waypoint": "1"},
-#{"kind": "to_waypoint", "waypoint": "2"},
-#]
-
 wp/tasks: [
 {"kind": "to_waypoint", "waypoint": "1"},
-{"kind": "to_waypoint", "waypoint": "3"},
-{"kind": "to_waypoint", "waypoint": "4"},
 {"kind": "to_waypoint", "waypoint": "2"},
-{"kind": "to_waypoint", "waypoint": "4"},
-{"kind": "to_waypoint", "waypoint": "3"},
 ]
+
+#wp/tasks: [
+#{"kind": "to_waypoint", "waypoint": "1"},
+#{"kind": "to_waypoint", "waypoint": "3"},
+#{"kind": "to_waypoint", "waypoint": "4"},
+#{"kind": "to_waypoint", "waypoint": "2"},
+#{"kind": "to_waypoint", "waypoint": "4"},
+#{"kind": "to_waypoint", "waypoint": "3"},
+#]
 
 # distance within waypoint is accepted, in [m]
 wp/target_radius: 4
